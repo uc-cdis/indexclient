@@ -5,30 +5,35 @@ import argparse
 
 import requests
 
-from index import errors
+from index.errors import BaseIndexError
 
 
-def delete_alias(**kwargs):
-    print(kwargs)
+def delete_record(did, rev, **kwargs):
+    '''
+    Create a new record.
+    '''
+    resource = 'http://localhost:8080/index/{did}'.format(did=did)
 
+    params = {
+        'rev': rev,
+    }
 
-def delete_record(**kwargs):
-    print(kwargs)
+    res = requests.delete(resource, params=params)
 
+    try: res.raise_for_status()
+    except Exception as err:
+        raise BaseIndexError(res.status_code, res.text)
 
 def config(parser):
     '''
     Configure the delete command.
     '''
-    parser.set_defaults(func=delete_alias)
+    parser.set_defaults(func=delete_record)
 
-    parser.add_argument('-r','--record',
-        action='store_const',
-        const=delete_record,
-        dest='func',
-        help='look up by record id directly',
+    parser.add_argument('did',
+        help='id of record to delete',
     )
 
-    parser.add_argument('alias',
-        help='id or alias of record to delete',
+    parser.add_argument('rev',
+        help='current revision of record',
     )
