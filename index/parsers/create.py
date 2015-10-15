@@ -47,7 +47,6 @@ def config(parser):
     )
 
     parser.add_argument('--size',
-        default=0,
         type=int,
         help='size in bytes',
     )
