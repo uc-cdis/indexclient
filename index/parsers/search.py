@@ -8,20 +8,10 @@ import requests
 from index import errors
 
 
-def search_record(alias=None, limit=None, start=None, hashes=[], **kwargs):
+def search_record(limit=None, start=None, size=None, hashes=[], **kwargs):
     '''
     Finds records matching specified search criteria.
     '''
-    alias = '' if alias is None else alias
-
-    resource = 'http://localhost:8080/index/{alias}'.format(alias=alias)
-
-    params = {
-        'limit': limit,
-        'start': start,
-        'alias': None,
-    }
-
     hash_set = set((h,v) for h,v in hashes)
     hash_dict = {h:v for h,v in hash_set}
 
@@ -34,7 +24,18 @@ def search_record(alias=None, limit=None, start=None, hashes=[], **kwargs):
         for h, _ in hash_set:
             logging.error('multiple values specified for {h}'.format(h=h))
         
-        sys.exit(1)
+        raise ValueError('conflicting hashes provided')
+
+    hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
+
+    resource = 'http://localhost:8080/index/'
+
+    params = {
+        'limit': limit,
+        'start': start,
+        'hash': hashes,
+        'size': size,
+    }
 
     res = requests.get(resource, params=params)
 
@@ -58,12 +59,6 @@ def search_alias(alias=None, limit=None, start=None, hashes=[], **kwargs):
 
     resource = 'http://localhost:8080/index/{alias}'.format(alias=alias)
 
-    params = {
-        'limit': limit,
-        'start': start,
-        'alias': True,
-    }
-
     hash_set = set((h,v) for h,v in hashes)
     hash_dict = {h:v for h,v in hash_set}
 
@@ -76,7 +71,15 @@ def search_alias(alias=None, limit=None, start=None, hashes=[], **kwargs):
         for h, _ in hash_set:
             logging.error('multiple values specified for {h}'.format(h=h))
         
-        sys.exit(1)
+        raise ValueError('conflicting hashes provided')
+
+    hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
+
+    params = {
+        'limit': limit,
+        'start': start,
+        'hash': hashes,
+    }
 
     res = requests.get(resource, params=params)
 
