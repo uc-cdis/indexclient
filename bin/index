@@ -12,10 +12,12 @@ except ImportError: # Python 2.x
 import requests
 
 from index import errors
-from index.parsers import post
 from index.parsers import alias
-from index.parsers import delete
 from index.parsers import search
+from index.parsers import create
+from index.parsers import retrieve
+from index.parsers import update
+from index.parsers import delete
 
 
 def setup_logging(log_levels, log_stream, **kwargs):
@@ -82,11 +84,23 @@ if __name__ == '__main__':
     search_subparser.set_defaults(func=not_implemented)
     search.config(search_subparser)
 
-    post_subparser = subparsers.add_parser('post',
-        help='create or update records',
+    create_subparser = subparsers.add_parser('create',
+        help='create a record',
     )
-    post_subparser.set_defaults(func=not_implemented)
-    post.config(post_subparser)
+    create_subparser.set_defaults(func=not_implemented)
+    create.config(create_subparser)
+
+    retrieve_subparser = subparsers.add_parser('retrieve',
+        help='retrieve a record',
+    )
+    retrieve_subparser.set_defaults(func=not_implemented)
+    retrieve.config(retrieve_subparser)
+
+    update_subparser = subparsers.add_parser('update',
+        help='update a record',
+    )
+    update_subparser.set_defaults(func=not_implemented)
+    update.config(update_subparser)
 
     delete_subparser = subparsers.add_parser('delete',
         help='delete a record or alias',

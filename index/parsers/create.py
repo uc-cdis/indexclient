@@ -4,20 +4,21 @@ import argparse
 
 import requests
 
-from index import errors
+from index.errors import BaseIndexError
 
 
-def post_record(hashes, urls, size, **kwargs):
+
+def create_record(form, size, urls, hashes, **kwargs):
     '''
-    Post a new record.
+    Create a new record.
     '''
     resource = 'http://localhost:8080/index/'
 
     data = {
-        'hash': {h:v for h,v in hashes},
+        'form': form,
         'size': size,
         'urls': urls,
-        'type': 'object',
+        'hashes': {h:v for h,v in hashes},
     }
 
     res = requests.post(resource, json=data)
@@ -36,29 +37,28 @@ def post_record(hashes, urls, size, **kwargs):
 
 def config(parser):
     '''
-    Configure the post command.
+    Configure the create command.
     '''
-    parser.set_defaults(func=post_record)
+    parser.set_defaults(func=create_record)
 
-    parser.add_argument('alias',
-        nargs='?',
-        help='optional alias to assign',
+    parser.add_argument('form',
+        choices=['object', 'container', 'multipart'],
+        help='record format',
+    )
+
+    parser.add_argument('--size',
+        default=0,
+        type=int,
+        help='size in bytes',
     )
 
     parser.add_argument('--hash',
-        required=True,
         nargs=2,
         metavar=('TYPE', 'VALUE'),
         action='append',
         dest='hashes',
         default=[],
         help='hash type and value',
-    )
-
-    parser.add_argument('--size',
-        required=True,
-        type=int,
-        help='size in bytes',
     )
 
     parser.add_argument('--url',
