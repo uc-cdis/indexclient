@@ -103,7 +103,7 @@ if __name__ == '__main__':
     update.config(update_subparser)
 
     delete_subparser = subparsers.add_parser('delete',
-        help='delete a record or alias',
+        help='delete a record',
     )
     delete_subparser.set_defaults(func=not_implemented)
     delete.config(delete_subparser)

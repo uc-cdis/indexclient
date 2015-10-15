@@ -31,9 +31,9 @@ def config(parser):
     parser.set_defaults(func=delete_record)
 
     parser.add_argument('did',
-        help='id or alias of record to delete',
+        help='id of record to delete',
     )
 
     parser.add_argument('rev',
-        help='current revision of did',
+        help='current revision of record',
     )
