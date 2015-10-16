@@ -14,6 +14,7 @@ import requests
 from index import errors
 from index.parsers import alias
 from index.parsers import search
+from index.parsers import locate
 from index.parsers import create
 from index.parsers import retrieve
 from index.parsers import update
@@ -84,6 +85,12 @@ if __name__ == '__main__':
     search_subparser.set_defaults(func=not_implemented)
     search.config(search_subparser)
 
+    locate_subparser = subparsers.add_parser('locate',
+        help='gather locations given a set of hashes',
+    )
+    locate_subparser.set_defaults(func=not_implemented)
+    locate.config(locate_subparser)
+
     create_subparser = subparsers.add_parser('create',
         help='create a record',
     )
@@ -122,6 +129,6 @@ if __name__ == '__main__':
         reason = str(err)
         logging.error('{status}:{reason}'.format(status=status, reason=reason))
     except requests.exceptions.ConnectionError as err:
-        logging.error('{reason}'.format(reason='connection error'))
+        logging.error('{"error": "connection error"}')
     finally:
         sys.exit(1)
