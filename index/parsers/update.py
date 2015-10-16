@@ -7,11 +7,15 @@ import requests
 from index.errors import BaseIndexError
 
 
-def update_record(did, rev, size, urls, hashes, **kwargs):
+def update_record(host, port, did, rev, size, urls, hashes, **kwargs):
     '''
     Update a record.
     '''
-    resource = 'http://localhost:8080/index/{did}'.format(did=did)
+    resource = 'http://{host}:{port}/index/{did}'.format(
+        host=host,
+        port=port,
+        did=did,
+    )
 
     params = {
         'rev': rev,

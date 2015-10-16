@@ -8,11 +8,14 @@ from index.errors import BaseIndexError
 
 
 
-def create_record(form, size, urls, hashes, **kwargs):
+def create_record(host, port, form, size, urls, hashes, **kwargs):
     '''
     Create a new record.
     '''
-    resource = 'http://localhost:8080/index/'
+    resource = 'http://{host}:{port}/index/'.format(
+        host=host,
+        port=port,
+    )
 
     data = {
         'form': form,

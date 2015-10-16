@@ -8,11 +8,15 @@ import requests
 from index import errors
 
 
-def info(name, **kwargs):
+def info(host, port, name, **kwargs):
     '''
     Retrieve info by name.
     '''
-    resource = 'http://localhost:8080/alias/{name}'.format(name=name)
+    resource = 'http://{host}:{port}/alias/{name}'.format(
+        host=host,
+        port=port,
+        name=name,
+    )
 
     res = requests.get(resource)
 

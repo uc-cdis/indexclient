@@ -8,7 +8,7 @@ import requests
 from index import errors
 
 
-def search_record(limit=None, start=None, size=None, hashes=[], **kwargs):
+def search_record(host, port, limit=None, start=None, size=None, hashes=[], **kwargs):
     '''
     Finds records matching specified search criteria.
     '''
@@ -28,7 +28,10 @@ def search_record(limit=None, start=None, size=None, hashes=[], **kwargs):
 
     hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
 
-    resource = 'http://localhost:8080/index/'
+    resource = 'http://{host}:{port}/index/'.format(
+        host=host,
+        port=port,
+    )
 
     params = {
         'limit': limit,
@@ -50,7 +53,7 @@ def search_record(limit=None, start=None, size=None, hashes=[], **kwargs):
 
     sys.stdout.write(json.dumps(doc))
 
-def search_names(limit=None, start=None, size=None, hashes=[], **kwargs):
+def search_names(host, port, limit=None, start=None, size=None, hashes=[], **kwargs):
     '''
     Finds records matching specified search criteria.
     '''
@@ -70,7 +73,10 @@ def search_names(limit=None, start=None, size=None, hashes=[], **kwargs):
 
     hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
 
-    resource = 'http://localhost:8080/alias/'
+    resource = 'http://{host}:{port}/alias/'.format(
+        host,
+        port,
+    )
 
     params = {
         'limit': limit,

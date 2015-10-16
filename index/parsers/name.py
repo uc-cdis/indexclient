@@ -7,12 +7,16 @@ import requests
 from index import errors
 
 
-def name_record(name, rev=None, size=None, hashes=None, release=None,
+def name_record(host, port, name, rev=None, size=None, hashes=None, release=None,
                 metadata=None, hosts=None, keeper=None, **kwargs):
     '''
     Alias a record.
     '''
-    resource = 'http://localhost:8080/alias/{name}'.format(name=name)
+    resource = 'http://{host}:{port}/alias/{name}'.format(
+        host=host,
+        port=port,
+        name=name,
+    )
 
     params = {
         'rev': rev,
