@@ -50,15 +50,10 @@ def search_record(limit=None, start=None, size=None, hashes=[], **kwargs):
 
     sys.stdout.write(json.dumps(doc))
 
-
-def search_alias(alias=None, limit=None, start=None, urls=[], hashes=[], **kwargs):
+def search_names(limit=None, start=None, size=None, hashes=[], **kwargs):
     '''
-    Find a alias record.
+    Finds records matching specified search criteria.
     '''
-    alias = '' if alias is None else alias
-
-    resource = 'http://localhost:8080/index/{alias}'.format(alias=alias)
-
     hash_set = set((h,v) for h,v in hashes)
     hash_dict = {h:v for h,v in hash_set}
 
@@ -75,11 +70,13 @@ def search_alias(alias=None, limit=None, start=None, urls=[], hashes=[], **kwarg
 
     hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
 
+    resource = 'http://localhost:8080/alias/'
+
     params = {
         'limit': limit,
         'start': start,
-        'hash': hashes,
-        'urls': urls,
+        'size': size,
+        'hashes': hashes,
     }
 
     res = requests.get(resource, params=params)
@@ -100,18 +97,13 @@ def config(parser):
     '''
     Configure the search command.
     '''
-    parser.set_defaults(func=search_alias)
+    parser.set_defaults(func=search_record)
 
-    parser.add_argument('-r','--record',
+    parser.add_argument('--names',
         action='store_const',
-        const=search_record,
+        const=search_names,
         dest='func',
-        help='look up by record id directly',
-    )
-
-    parser.add_argument('alias',
-        nargs='?',
-        help='id or alias of record to retrieve',
+        help='search names instead of records',
     )
 
     parser.add_argument('--limit',
