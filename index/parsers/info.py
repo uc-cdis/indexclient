@@ -1,5 +1,6 @@
 import sys
 import json
+import logging
 import argparse
 
 import requests
@@ -7,17 +8,13 @@ import requests
 from index import errors
 
 
-def alias_record(alias, record, **kwargs):
+def info(name, **kwargs):
     '''
-    Alias a record.
+    Retrieve info by name.
     '''
-    resource = 'http://localhost:8080/alias/{alias}'.format(alias=alias)
+    resource = 'http://localhost:8080/alias/{name}'.format(name=name)
 
-    params = {
-        'record': record,
-    }
-
-    res = requests.put(resource, params=params)
+    res = requests.get(resource)
 
     try: res.raise_for_status()
     except Exception as err:
@@ -33,14 +30,10 @@ def alias_record(alias, record, **kwargs):
 
 def config(parser):
     '''
-    Configure the alias command.
+    Configure the info command.
     '''
-    parser.set_defaults(func=alias_record)
+    parser.set_defaults(func=info)
 
-    parser.add_argument('record',
-        help='record id to alias',
-    )
-
-    parser.add_argument('alias',
-        help='alias to assign',
+    parser.add_argument('name',
+        help='name of information to retrieve',
     )
