@@ -66,6 +66,17 @@ if __name__ == '__main__':
         help='target log file',
     )
 
+    parser.add_argument('--host',
+        default='localhost',
+        help='indexd server host [localhost]',
+    )
+
+    parser.add_argument('--port',
+        default=8080,
+        type=int,
+        help='indexd server port [8080]',
+    )
+
     # Add index and alias sub-commands.
     subparsers = parser.add_subparsers(
         title='commands',

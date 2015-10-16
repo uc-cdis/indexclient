@@ -8,11 +8,15 @@ import requests
 from index import errors
 
 
-def retrieve_record(did, **kwargs):
+def retrieve_record(host, port, did, **kwargs):
     '''
     Retrieve a record by id.
     '''
-    resource = 'http://localhost:8080/index/{did}'.format(did=did)
+    resource = 'http://{host}:{port}/index/{did}'.format(
+        host=host,
+        port=port,
+        did=did,
+    )
 
     res = requests.get(resource)
 

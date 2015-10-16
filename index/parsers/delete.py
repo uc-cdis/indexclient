@@ -8,11 +8,15 @@ import requests
 from index.errors import BaseIndexError
 
 
-def delete_record(did, rev, **kwargs):
+def delete_record(host, port, did, rev, **kwargs):
     '''
     Create a new record.
     '''
-    resource = 'http://localhost:8080/index/{did}'.format(did=did)
+    resource = 'http://{host}:{port}/index/{did}'.format(
+        host=host,
+        port=port,
+        did=did,
+    )
 
     params = {
         'rev': rev,
