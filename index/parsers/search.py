@@ -51,7 +51,7 @@ def search_record(limit=None, start=None, size=None, hashes=[], **kwargs):
     sys.stdout.write(json.dumps(doc))
 
 
-def search_alias(alias=None, limit=None, start=None, hashes=[], **kwargs):
+def search_alias(alias=None, limit=None, start=None, urls=[], hashes=[], **kwargs):
     '''
     Find a alias record.
     '''
@@ -79,6 +79,7 @@ def search_alias(alias=None, limit=None, start=None, hashes=[], **kwargs):
         'limit': limit,
         'start': start,
         'hash': hashes,
+        'urls': urls,
     }
 
     res = requests.get(resource, params=params)
@@ -129,4 +130,11 @@ def config(parser):
         dest='hashes',
         default=[],
         help='filter based on hash values',
+    )
+
+    parser.add_argument('--url',
+        action='append',
+        dest='urls',
+        default=[],
+        help='filter based on urls',
     )
