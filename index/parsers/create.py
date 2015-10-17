@@ -17,11 +17,30 @@ def create_record(host, port, form, size, urls, hashes, **kwargs):
         port=port,
     )
 
+    if size < 0:
+        raise ValueError('size must be non-negative')
+
+    urls_set = set(urls)
+
+    hash_set = set((h,v) for h,v in hashes)
+    hash_dict = {h:v for h,v in hash_set}
+
+    if len(hash_dict) < len(hash_set):
+        logging.error('multiple incompatible hashes specified')
+        
+        for h in hash_dict.items():
+            hash_set.remove(h)
+        
+        for h, _ in hash_set:
+            logging.error('multiple values specified for {h}'.format(h=h))
+        
+        raise ValueError('conflicting hashes provided')
+
     data = {
         'form': form,
         'size': size,
-        'urls': urls,
-        'hashes': {h:v for h,v in hashes},
+        'urls': [u for u in urls_set],
+        'hashes': hash_dict,
     }
 
     res = requests.post(resource, json=data)
@@ -50,11 +69,13 @@ def config(parser):
     )
 
     parser.add_argument('--size',
+        required=True,
         type=int,
         help='size in bytes',
     )
 
     parser.add_argument('--hash',
+        required=True,
         nargs=2,
         metavar=('TYPE', 'VALUE'),
         action='append',

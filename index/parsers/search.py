@@ -8,10 +8,16 @@ import requests
 from index import errors
 
 
-def search_record(host, port, limit=None, start=None, size=None, hashes=[], **kwargs):
+def search_record(host, port, limit, start, size, hashes, **kwargs):
     '''
     Finds records matching specified search criteria.
     '''
+    if size is not None and size < 0:
+        raise ValueError('size must be non-negative')
+
+    if limit is not None and limit < 0:
+        raise ValueError('limit must be non-negative')
+
     hash_set = set((h,v) for h,v in hashes)
     hash_dict = {h:v for h,v in hash_set}
 
@@ -53,10 +59,16 @@ def search_record(host, port, limit=None, start=None, size=None, hashes=[], **kw
 
     sys.stdout.write(json.dumps(doc))
 
-def search_names(host, port, limit=None, start=None, size=None, hashes=[], **kwargs):
+def search_names(host, port, limit, start, size, hashes, **kwargs):
     '''
     Finds records matching specified search criteria.
     '''
+    if size is not None and size < 0:
+        raise ValueError('size must be non-negative')
+
+    if limit is not None and limit < 0:
+        raise ValueError('limit must be non-negative')
+
     hash_set = set((h,v) for h,v in hashes)
     hash_dict = {h:v for h,v in hash_set}
 
@@ -74,8 +86,8 @@ def search_names(host, port, limit=None, start=None, size=None, hashes=[], **kwa
     hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
 
     resource = 'http://{host}:{port}/alias/'.format(
-        host,
-        port,
+        host=host,
+        port=port,
     )
 
     params = {
@@ -113,12 +125,20 @@ def config(parser):
     )
 
     parser.add_argument('--limit',
+        default=None,
         type=int,
-        help='limit on number of ids to retrieve [100]',
+        help='limit on number of ids to retrieve',
     )
 
     parser.add_argument('--start',
-        help='starting id or alias [""]',
+        default=None,
+        help='starting id or alias',
+    )
+
+    parser.add_argument('--size',
+        default=None,
+        type=int,
+        help='filter based on size',
     )
 
     parser.add_argument('--hash',

@@ -7,7 +7,7 @@ import requests
 from index.errors import BaseIndexError
 
 
-def update_record(host, port, did, rev, size, urls, hashes, **kwargs):
+def update_record(host, port, did, rev, size, hashes, urls, **kwargs):
     '''
     Update a record.
     '''
@@ -21,10 +21,29 @@ def update_record(host, port, did, rev, size, urls, hashes, **kwargs):
         'rev': rev,
     }
 
+    if size < 0:
+        raise ValueError('size must be non-negative')
+
+    urls_set = set(urls)
+
+    hash_set = set((h,v) for h,v in hashes)
+    hash_dict = {h:v for h,v in hash_set}
+
+    if len(hash_dict) < len(hash_set):
+        logging.error('multiple incompatible hashes specified')
+        
+        for h in hash_dict.items():
+            hash_set.remove(h)
+        
+        for h, _ in hash_set:
+            logging.error('multiple values specified for {h}'.format(h=h))
+        
+        raise ValueError('conflicting hashes provided')
+
     data = {
         'size': size,
-        'urls': urls,
-        'hashes': {h:v for h,v in hashes},
+        'urls': [u for u in urls_set],
+        'hashes': hash_dict,
     }
 
     res = requests.put(resource, params=params, json=data)
@@ -56,8 +75,18 @@ def config(parser):
     )
 
     parser.add_argument('--size',
+        required=True,
         type=int,
         help='size in bytes',
+    )
+
+    parser.add_argument('--hash',
+        required=True,
+        nargs=2,
+        metavar=('TYPE', 'VALUE'),
+        action='append',
+        dest='hashes',
+        help='hash type and value',
     )
 
     parser.add_argument('--url',
@@ -66,13 +95,4 @@ def config(parser):
         dest='urls',
         default=[],
         help='known URLs associated with data',
-    )
-
-    parser.add_argument('--hash',
-        nargs=2,
-        metavar=('TYPE', 'VALUE'),
-        action='append',
-        dest='hashes',
-        default=[],
-        help='hash type and value',
     )
