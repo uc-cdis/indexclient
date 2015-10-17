@@ -7,8 +7,8 @@ import requests
 from index import errors
 
 
-def name_record(host, port, name, rev=None, size=None, hashes=None, release=None,
-                metadata=None, hosts=None, keeper=None, **kwargs):
+def name_record(host, port, name, rev, size, hashes,
+                release, metadata, hosts, keeper, **kwargs):
     '''
     Alias a record.
     '''
@@ -22,12 +22,31 @@ def name_record(host, port, name, rev=None, size=None, hashes=None, release=None
         'rev': rev,
     }
 
+    if size is not None and size < 0:
+        raise ValueError('size must be non-negative')
+
+    host_set = set(hosts)
+
+    hash_set = set((h,v) for h,v in hashes)
+    hash_dict = {h:v for h,v in hash_set}
+
+    if len(hash_dict) < len(hash_set):
+        logging.error('multiple incompatible hashes specified')
+        
+        for h in hash_dict.items():
+            hash_set.remove(h)
+        
+        for h, _ in hash_set:
+            logging.error('multiple values specified for {h}'.format(h=h))
+        
+        raise ValueError('conflicting hashes provided')
+
     data = {
         'size': size,
-        'hashes': None if hashes is None else {h:v for h,v in hashes},
+        'hashes': hash_dict,
         'release': release,
         'metadata': metadata,
-        'host_authorities': [h for h in set(hosts)],
+        'host_authorities': [h for h in host_set],
         'keeper_authority': keeper,
     }
 
@@ -71,7 +90,7 @@ def config(parser):
         metavar=('TYPE', 'VALUE'),
         action='append',
         dest='hashes',
-        default=None,
+        default=[],
         help='hash type and value',
     )
 
@@ -87,7 +106,7 @@ def config(parser):
     parser.add_argument('--host',
         action='append',
         dest='hosts',
-        default=None,
+        default=[],
         help='host authority',
     )
 
