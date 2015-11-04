@@ -14,6 +14,7 @@ import requests
 from index import errors
 from index.parsers import info
 from index.parsers import name
+from index.parsers import find
 from index.parsers import search
 from index.parsers import create
 from index.parsers import retrieve
@@ -94,6 +95,11 @@ if __name__ == '__main__':
         help='create or update a name with information',
     )
     name.config(name_subparser)
+
+    find_subparser = subparsers.add_parser('find',
+        help='retrieve urls from hashes',
+    )
+    find.config(find_subparser)
 
     search_subparser = subparsers.add_parser('search',
         help='search for records',
