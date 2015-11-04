@@ -63,7 +63,7 @@ if __name__ == '__main__':
         dest='log_stream',
         metavar='LOGFILE',
         type=argparse.FileType('a'),
-        default=sys.stdout,
+        default=sys.stderr,
         help='target log file',
     )
 
