@@ -14,6 +14,7 @@ import requests
 from index import errors
 from index.parsers import info
 from index.parsers import name
+from index.parsers import find
 from index.parsers import search
 from index.parsers import create
 from index.parsers import retrieve
@@ -43,6 +44,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.set_defaults(log_levels=[logging.ERROR])
+    parser.set_defaults(func=not_implemented)
 
     parser.add_argument('--debug',
         action='append_const',
@@ -62,7 +64,7 @@ if __name__ == '__main__':
         dest='log_stream',
         metavar='LOGFILE',
         type=argparse.FileType('a'),
-        default=sys.stdout,
+        default=sys.stderr,
         help='target log file',
     )
 
@@ -87,43 +89,41 @@ if __name__ == '__main__':
     info_subparser = subparsers.add_parser('info',
         help='retrieve information by name',
     )
-    info_subparser.set_defaults(func=not_implemented)
     info.config(info_subparser)
 
     name_subparser = subparsers.add_parser('name',
         help='create or update a name with information',
     )
-    name_subparser.set_defaults(func=not_implemented)
     name.config(name_subparser)
+
+    find_subparser = subparsers.add_parser('find',
+        help='retrieve urls from hashes',
+    )
+    find.config(find_subparser)
 
     search_subparser = subparsers.add_parser('search',
         help='search for records',
     )
-    search_subparser.set_defaults(func=not_implemented)
     search.config(search_subparser)
 
     create_subparser = subparsers.add_parser('create',
         help='create a record',
     )
-    create_subparser.set_defaults(func=not_implemented)
     create.config(create_subparser)
 
     retrieve_subparser = subparsers.add_parser('retrieve',
         help='retrieve a record',
     )
-    retrieve_subparser.set_defaults(func=not_implemented)
     retrieve.config(retrieve_subparser)
 
     update_subparser = subparsers.add_parser('update',
         help='update a record',
     )
-    update_subparser.set_defaults(func=not_implemented)
     update.config(update_subparser)
 
     delete_subparser = subparsers.add_parser('delete',
         help='delete a record',
     )
-    delete_subparser.set_defaults(func=not_implemented)
     delete.config(delete_subparser)
 
     # Parse command line arguments and set up for execution.
