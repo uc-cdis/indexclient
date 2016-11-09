@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(
-    name='index',
+    name='indexclient',
     version='0.1',
     packages=[
-        'index',
-        'index.parsers',
+        'indexclient',
+        'indexclient.parsers',
     ],
     install_requires=[
         'requests==2.7.0',
