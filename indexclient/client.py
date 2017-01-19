@@ -16,7 +16,8 @@ def handle_error(resp):
 
 class IndexClient(object):
 
-    def __init__(self, baseurl, version="v0"):
+    def __init__(self, baseurl, version="v0", auth=None):
+        self.auth = auth
         self.url = baseurl
         self.version = version
         self.check_status()
@@ -60,16 +61,17 @@ class IndexClient(object):
                     return
             params["after"] = json["ids"][-1]
 
-    def create(self, did=None, urls=[], sha1=None):
+    def create(self, did=None, urls=[], hashes={}, size=None):
         json = {
             "urls": urls,
+            "form": "object",
+            "hashes": hashes,
+            "size": size
         }
         if did:
             json["did"] = did
-        if sha1:
-            json["sha1"] = sha1
-        resp = self._post("index", headers={"content-type": "application/json"},
-                          data=json_dumps(json))
+        resp = self._post("index/", headers={"content-type": "application/json"},
+                          data=json_dumps(json), auth=self.auth)
         return Document(self, resp.json()["did"])
 
     def _get(self, *path, **kwargs):
