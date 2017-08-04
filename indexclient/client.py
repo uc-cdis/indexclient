@@ -1,6 +1,7 @@
-import requests
 from json import dumps as json_dumps
 from urlparse import urljoin
+
+import requests
 
 
 def handle_error(resp):
@@ -22,7 +23,7 @@ class IndexClient(object):
         self.version = version
         self.check_status()
 
-    
+
 
     def url_for(self, *path):
         return urljoin(self.url, "/".join(path))
@@ -74,6 +75,23 @@ class IndexClient(object):
                           data=json_dumps(json), auth=self.auth)
         return Document(self, resp.json()["did"])
 
+    def create_alias(
+            self, record, rev=None, size=None, hashes={}, release=None,
+            metastring=None, host_authorities=None, keeper_authority=None):
+        data = json_dumps({
+            'rev': rev,
+            'size': size,
+            'hashes': hashes,
+            'release': release,
+            'metastring': metastring,
+            'host_authorities': host_authorities,
+            'keeper_authority': keeper_authority,
+        })
+        url = '/alias/' + record
+        headers = {'content-type': 'application/json'}
+        resp = self._put(url, headers=headers, data=data, auth=self.auth)
+        return Document(self, resp.json())
+
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)
@@ -81,6 +99,11 @@ class IndexClient(object):
 
     def _post(self, *path, **kwargs):
         resp = requests.post(self.url_for(*path), **kwargs)
+        handle_error(resp)
+        return resp
+
+    def _put(self, *path, **kwargs):
+        resp = requests.put(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
