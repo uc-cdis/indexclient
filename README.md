@@ -52,27 +52,8 @@ sources in a secure manner.
 Additional metadata that is store in index records include the size of the
 data as well as the type.
 
-Records adhere to the following json-schema:
+Records adhere to the json-schema described in [indexd](https://github.com/LabAdvComp/indexd/blob/master/indexd/index/schema.py#L1):
 
-```json
-{
-    "properties": {
-        "id": {
-            "type": "string",
-            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-        },
-        "rev": {"type": "string"},
-        "size": {"type": "integer"},
-        "hash": {
-            "type": "object",
-            "additionalProperties": true,
-        },
-        "type": { "enum": ["object", "collection", "multipart"] }
-    },
-    "required": ["size","hash"],
-    "additionalProperties": false
-}
-```
 
 An example of one such record:
 
@@ -86,7 +67,10 @@ An example of one such record:
         "sha1": "cb4e5ba5d30fd4667beba95bf73ea9d76ad3dcd4",
         "sha256": "20b599fa98f5f98e89e128ba6de3b65ff753c662721f368649fb8d7e7d4933b0"
     },
-    "type": "object"
+    "type": "object",
+    "urls": [
+      "s3://endpointurl/bucket/key"
+    ]
 }
 ```
 
