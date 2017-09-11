@@ -44,10 +44,10 @@ class IndexClient(object):
                 raise e
         return Document(self, did)
 
-    def list(self, limit=float("inf"), after=None, page_size=100):
+    def list(self, limit=float("inf"), start=None, page_size=100):
         """ Returns a generator of document objects. """
         yielded = 0
-        params = {"limit": page_size, "after": after}
+        params = {"limit": page_size, "start": start}
         while True:
             resp = self._get("index", params=params)
             handle_error(resp)
@@ -60,7 +60,7 @@ class IndexClient(object):
                     yielded += 1
                 else:
                     return
-            params["after"] = json["ids"][-1]
+            params["start"] = json['ids'][-1]
 
     def create(self, did=None, urls=[], hashes={}, size=None):
         json = {
@@ -107,11 +107,6 @@ class IndexClient(object):
         handle_error(resp)
         return resp
 
-    def _patch(self, *path, **kwargs):
-        resp = requests.patch(self.url_for(*path), **kwargs)
-        handle_error(resp)
-        return resp
-
     def _delete(self, *path, **kwargs):
         resp = requests.delete(self.url_for(*path), **kwargs)
         handle_error(resp)
@@ -137,15 +132,15 @@ class Document(object):
         if self._deleted:
             raise DocumentDeletedError("document {} has been deleted".format(self.did))
 
-    def _render(self, include_rev=False):
+    def _render(self, include_rev=True):
         self._check_deleted()
         if not self._fetched:
             raise RuntimeError("Document must be fetched from server with doc.refresh() before being rendered as json")
         json = {
             "urls": self.urls,
+            "hashes": self.hashes,
+            "size": self.size
         }
-        if self.sha1:
-            json["sha1"] = self.sha1
         if include_rev:
             json["rev"] = self.rev
         return json
@@ -162,22 +157,24 @@ class Document(object):
         assert json["did"] == self.did
         self.urls = json["urls"]
         self.rev = json["rev"]
-        if json.get("sha1"):
-            self.sha1 = json["sha1"]
+        self.size = json["size"]
+        self.hashes = json["hashes"]
         self._fetched = True
 
     def patch(self):
         """Patch the current document contents
         to be the new contents on the server"""
         self._check_deleted()
-        self.client._patch("did", self.did,
+        self.client._put("/index", self.did,
                            params={"rev": self.rev},
                            headers={"content-type": "application/json"},
+                           auth=self.client.auth,
                            data=json_dumps(self._render()))
         self.refresh()  # to sync new rev from server
 
     def delete(self):
         self._check_deleted()
-        self.client._delete("did", self.did,
+        self.client._delete("/index", self.did,
+                            auth=self.client.auth,
                             params={"rev": self.rev})
         self._deleted = True
