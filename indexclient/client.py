@@ -1,7 +1,11 @@
-from json import dumps as json_dumps
+import json
 from urlparse import urljoin
 
 import requests
+
+
+def json_dumps(data):
+    return json.dumps({k: v for (k, v) in data.items() if v is not None})
 
 
 def handle_error(resp):
@@ -62,7 +66,9 @@ class IndexClient(object):
                     return
             params["start"] = json['ids'][-1]
 
-    def create(self, did=None, urls=[], hashes={}, size=None):
+    def create(self, hashes, size, did=None, urls=None):
+        if urls is None:
+            urls = []
         json = {
             "urls": urls,
             "form": "object",
@@ -71,15 +77,15 @@ class IndexClient(object):
         }
         if did:
             json["did"] = did
-        resp = self._post("index/", headers={"content-type": "application/json"},
-                          data=json_dumps(json), auth=self.auth)
+        resp = self._post(
+            "index/", headers={"content-type": "application/json"},
+            data=json_dumps(json), auth=self.auth)
         return Document(self, resp.json()["did"])
 
     def create_alias(
-            self, record, rev=None, size=None, hashes={}, release=None,
+            self, record, size, hashes, release=None,
             metastring=None, host_authorities=None, keeper_authority=None):
         data = json_dumps({
-            'rev': rev,
             'size': size,
             'hashes': hashes,
             'release': release,
@@ -90,7 +96,7 @@ class IndexClient(object):
         url = '/alias/' + record
         headers = {'content-type': 'application/json'}
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
-        return Document(self, resp.json())
+        return resp.json()
 
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
