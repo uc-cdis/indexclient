@@ -48,6 +48,23 @@ class IndexClient(object):
                 raise e
         return Document(self, did)
 
+    def get_with_params(self, params=None):
+        """
+        Return a document object corresponding to the supplied parameters, such
+        as ``{'hashes': {'md5': '...', 'size': '...'}}``.
+        """
+        try:
+            response = self._get("index", params=params)
+        except requests.HTTPError as e:
+            if e.response.status_code == 404:
+                return None
+            else:
+                raise e
+        if not response.json()['ids']:
+            return None
+        did = response.json()['ids'][0]
+        return Document(self, did)
+
     def list(self, limit=float("inf"), start=None, page_size=100):
         """ Returns a generator of document objects. """
         yielded = 0
