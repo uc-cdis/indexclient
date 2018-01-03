@@ -28,7 +28,7 @@ class IndexClient(object):
 
 
     def url_for(self, *path):
-        return urljoin(self.url, path)
+        return urljoin(self.url, "/".join(path))
 
     def check_status(self):
         """Check that the API we are trying to communicate with is online"""
