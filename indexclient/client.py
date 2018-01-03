@@ -40,13 +40,13 @@ class IndexClient(object):
     def get(self, did):
         """Return a document object corresponding to a single did"""
         try:
-            self._get("index", did)
+            response = self._get("index", did)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
             else:
                 raise e
-        return Document(self, did)
+        return Document(self, did, json=response.json())
 
     def get_with_params(self, params=None):
         """
@@ -142,14 +142,14 @@ class DocumentDeletedError(Exception):
 
 class Document(object):
 
-    def __init__(self, client, did):
+    def __init__(self, client, did, json=None):
         self.client = client
         self.did = did
         self.urls = None
         self.sha1 = None
         self._fetched = False
         self._deleted = False
-        self.refresh()
+        self.refresh(json)
 
     def _check_deleted(self):
         if self._deleted:
@@ -173,10 +173,10 @@ class Document(object):
         json["did"] = self.did
         return json
 
-    def refresh(self):
+    def refresh(self, json=None):
         """refresh the document contents from the server"""
         self._check_deleted()
-        json = self.client._get("index", self.did).json()
+        json = json or self.client._get("index", self.did).json()
         assert json["did"] == self.did
         self.urls = json["urls"]
         self.rev = json["rev"]
