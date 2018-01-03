@@ -43,8 +43,12 @@ class IndexClient(object):
             if e.response.status_code == 404:
                 return None
             else:
-                raise e
-        return Document(self, did, json=response.json())
+                print("Exception!!" + str(e.reason))
+                return None
+        try:
+            return Document(self, did, json=response.json())
+        except ValueError as e:
+            return None
 
     def get_with_params(self, params=None):
         """
