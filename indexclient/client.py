@@ -25,8 +25,6 @@ class IndexClient(object):
         self.auth = auth
         self.url = baseurl
         self.version = version
-        self.check_status()
-
 
 
     def url_for(self, *path):
