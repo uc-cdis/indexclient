@@ -9,14 +9,15 @@ def json_dumps(data):
 
 
 def handle_error(resp):
-    if 400 <= resp.status_code < 600:
-        try:
-            json = resp.json()
-            resp.reason = json["error"]
-        except:
-            pass
-        finally:
-            resp.raise_for_status()
+    resp.raise_for_status()
+    #if 400 <= resp.status_code < 600:
+    #    try:
+    #        json = resp.json()
+    #        resp.reason = json["error"]
+    #    except:
+    #        pass
+    #    finally:
+    #        resp.raise_for_status()
 
 
 class IndexClient(object):
