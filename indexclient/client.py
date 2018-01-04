@@ -35,13 +35,25 @@ class IndexClient(object):
         resp = requests.get(self.url + '/index')
         handle_error(resp)
 
-    def get(self, did, no_dist=False):
-        """Return a document object corresponding to a single did"""
+    def global_get(self, did, no_dist=False):
+        """Return a document object corresponding to a single did from the global endpoint"""
         try:
             if no_dist:
-                response = self._get("index", did, no_dist=no_dist)
+                response = self._get(did, no_dist=no_dist)
             else:
-                response = self._get("index", did)
+                response = self._get(did)
+        except requests.HTTPError as e:
+            if e.response.status_code == 404:
+                return None
+            else:
+                raise e
+
+        return Document(self, did, json=response.json())
+
+    def get(self, did):
+        """Return a document object corresponding to a single did"""
+        try:
+            response = self._get("index", did)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
