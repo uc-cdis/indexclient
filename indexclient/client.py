@@ -35,20 +35,20 @@ class IndexClient(object):
         resp = requests.get(self.url + '/index')
         handle_error(resp)
 
-    def get(self, did):
+    def get(self, did, no_dist=False):
         """Return a document object corresponding to a single did"""
         try:
-            response = self._get("index", did)
+            if no_dist:
+                response = self._get("index", did, no_dist=no_dist)
+            else:
+                response = self._get("index", did)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
             else:
-                print("Exception!!" + str(e.reason))
-                return None
-        try:
-            return Document(self, did, json=response.json())
-        except ValueError as e:
-            return None
+                raise e 
+        
+        return Document(self, did, json=response.json())
 
     def get_with_params(self, params=None):
         """
@@ -151,7 +151,7 @@ class Document(object):
         self.sha1 = None
         self._fetched = False
         self._deleted = False
-        self.refresh(json)
+        self._load(json)
 
     def _check_deleted(self):
         if self._deleted:
@@ -160,7 +160,7 @@ class Document(object):
     def _render(self, include_rev=True):
         self._check_deleted()
         if not self._fetched:
-            raise RuntimeError("Document must be fetched from server with doc.refresh() before being rendered as json")
+            raise RuntimeError("Document must be fetched from the server before being rendered as json")
         json = {
             "urls": self.urls,
             "hashes": self.hashes,
@@ -175,8 +175,8 @@ class Document(object):
         json["did"] = self.did
         return json
 
-    def refresh(self, json=None):
-        """refresh the document contents from the server"""
+    def _load(self, json=None):
+        """ Load the document contents from the server or from the provided dictionary """
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
         assert json["did"] == self.did
@@ -195,7 +195,7 @@ class Document(object):
                            headers={"content-type": "application/json"},
                            auth=self.client.auth,
                            data=json_dumps(self._render()))
-        self.refresh()  # to sync new rev from server
+        self._load()  # to sync new rev from server
 
     def delete(self):
         self._check_deleted()
