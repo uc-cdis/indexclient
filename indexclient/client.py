@@ -27,8 +27,6 @@ class IndexClient(object):
         self.version = version
         self.check_status()
 
-
-
     def url_for(self, *path):
         return urljoin(self.url, "/".join(path))
 
@@ -83,14 +81,15 @@ class IndexClient(object):
                     return
             params["start"] = json['ids'][-1]
 
-    def create(self, hashes, size, did=None, urls=None):
+    def create(self, hashes, size, did=None, urls=None, metadata=None):
         if urls is None:
             urls = []
         json = {
             "urls": urls,
             "form": "object",
             "hashes": hashes,
-            "size": size
+            "size": size,
+            "metadata": metadata
         }
         if did:
             json["did"] = did
@@ -108,7 +107,7 @@ class IndexClient(object):
             'release': release,
             'metastring': metastring,
             'host_authorities': host_authorities,
-            'keeper_authority': keeper_authority,
+            'keeper_authority': keeper_authority
         })
         url = '/alias/' + record
         headers = {'content-type': 'application/json'}
