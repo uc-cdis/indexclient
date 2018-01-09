@@ -145,10 +145,9 @@ class Document(object):
     def __init__(self, client, did):
         self.client = client
         self.did = did
-        self.urls = None
-        self.sha1 = None
         self._fetched = False
         self._deleted = False
+        self._doc = None
         self.refresh()
 
     def _check_deleted(self):
@@ -159,14 +158,7 @@ class Document(object):
         self._check_deleted()
         if not self._fetched:
             raise RuntimeError("Document must be fetched from server with doc.refresh() before being rendered as json")
-        json = {
-            "urls": self.urls,
-            "hashes": self.hashes,
-            "size": self.size
-        }
-        if include_rev:
-            json["rev"] = self.rev
-        return json
+        return self._doc
 
     def to_json(self, include_rev=True):
         json = self._render(include_rev=include_rev)
@@ -176,12 +168,11 @@ class Document(object):
     def refresh(self):
         """refresh the document contents from the server"""
         self._check_deleted()
-        json = self.client._get("index", self.did).json()
-        assert json["did"] == self.did
-        self.urls = json["urls"]
-        self.rev = json["rev"]
-        self.size = json["size"]
-        self.hashes = json["hashes"]
+        response = self.client._get("index", self.did).json()
+        self._doc = response
+        # set attributes to current Document
+        for k,v in response.iteritems():
+            self.__dict__[k] = v
         self._fetched = True
 
     def patch(self):
