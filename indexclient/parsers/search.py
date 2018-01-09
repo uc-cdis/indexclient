@@ -5,7 +5,7 @@ import argparse
 
 import requests
 
-from index import errors
+from indexclient import errors
 
 
 def search_record(host, port, limit, start, size, hashes, **kwargs):

@@ -27,8 +27,6 @@ class IndexClient(object):
         self.version = version
         self.check_status()
 
-
-
     def url_for(self, *path):
         return urljoin(self.url, "/".join(path))
 
@@ -83,14 +81,16 @@ class IndexClient(object):
                     return
             params["start"] = json['ids'][-1]
 
-    def create(self, hashes, size, did=None, urls=None):
+    def create(self, hashes, size, did=None, urls=None, file_name=None, metadata=None):
         if urls is None:
             urls = []
         json = {
             "urls": urls,
             "form": "object",
             "hashes": hashes,
-            "size": size
+            "size": size,
+            "file_name": file_name,
+            "metadata": metadata
         }
         if did:
             json["did"] = did
@@ -108,7 +108,7 @@ class IndexClient(object):
             'release': release,
             'metastring': metastring,
             'host_authorities': host_authorities,
-            'keeper_authority': keeper_authority,
+            'keeper_authority': keeper_authority
         })
         url = '/alias/' + record
         headers = {'content-type': 'application/json'}
@@ -189,10 +189,10 @@ class Document(object):
         to be the new contents on the server"""
         self._check_deleted()
         self.client._put("/index", self.did,
-                           params={"rev": self.rev},
-                           headers={"content-type": "application/json"},
-                           auth=self.client.auth,
-                           data=json_dumps(self._render()))
+                         params={"rev": self.rev},
+                         headers={"content-type": "application/json"},
+                         auth=self.client.auth,
+                         data=json_dumps(self._render()))
         self.refresh()  # to sync new rev from server
 
     def delete(self):

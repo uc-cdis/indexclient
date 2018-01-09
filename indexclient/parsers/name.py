@@ -4,7 +4,7 @@ import argparse
 
 import requests
 
-from index import errors
+from indexclient import errors
 
 
 def name_record(host, port, name, rev, size, hashes,

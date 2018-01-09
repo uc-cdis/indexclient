@@ -4,7 +4,7 @@ import argparse
 
 import requests
 
-from index.errors import BaseIndexError
+from indexclient.errors import BaseIndexError
 
 
 def update_record(host, port, did, rev, size, hashes, urls, **kwargs):

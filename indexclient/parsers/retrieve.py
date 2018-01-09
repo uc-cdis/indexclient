@@ -5,7 +5,7 @@ import argparse
 
 import requests
 
-from index import errors
+from indexclient import errors
 
 
 def retrieve_record(host, port, did, **kwargs):
