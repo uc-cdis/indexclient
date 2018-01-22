@@ -4,6 +4,9 @@ from urlparse import urljoin
 import requests
 
 
+UPDATABLE_ATTRS = ['file_name', 'urls', 'version']
+
+
 def json_dumps(data):
     return json.dumps({k: v for (k, v) in data.items() if v is not None})
 
@@ -147,7 +150,6 @@ class Document(object):
         self.did = did
         self._fetched = False
         self._deleted = False
-        self._doc = None
         self.refresh()
 
     def _check_deleted(self):
@@ -165,14 +167,25 @@ class Document(object):
         json["did"] = self.did
         return json
 
+    def _doc_for_update(self):
+        """
+        return document with subset of attributes that are allowed
+        to be updated
+        """
+        return {k:v for k,v in self._doc.items() if k in UPDATABLE_ATTRS}
+
+    @property
+    def _doc(self):
+        return {k: self.__dict__[k] for k in self._attrs}
+
     def refresh(self):
         """refresh the document contents from the server"""
         self._check_deleted()
         response = self.client._get("index", self.did).json()
-        self._doc = response
         # set attributes to current Document
         for k,v in response.iteritems():
             self.__dict__[k] = v
+        self._attrs = response.keys()
         self._fetched = True
 
     def patch(self):
@@ -183,7 +196,7 @@ class Document(object):
                          params={"rev": self.rev},
                          headers={"content-type": "application/json"},
                          auth=self.client.auth,
-                         data=json_dumps(self._render()))
+                         data=json_dumps(self._doc_for_update()))
         self.refresh()  # to sync new rev from server
 
     def delete(self):
