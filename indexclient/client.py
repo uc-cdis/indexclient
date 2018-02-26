@@ -70,8 +70,6 @@ class IndexClient(object):
         :param str did:
             The UUID for the index record we want to retrieve.
 
-        :param str url:
-            *optional* Specify the dbGaP url
         :returns: A Document object representing the index record
         """
         try:
