@@ -38,12 +38,23 @@ class IndexClient(object):
         handle_error(resp)
 
     def global_get(self, did, no_dist=False):
-        """Return a document object corresponding to a single did from the global endpoint"""
+        """
+        Makes a web request to the Indexd service global endpoint to retrieve
+        an index document record.
+
+        :param str did:
+            The UUID for the index record we want to retrieve.
+
+        :param boolean no_dist:
+            *optional* Specify if we want distributed search or not
+
+        :returns: A Document object representing the index record
+        """
         try:
             if no_dist:
-                response = self._get(did, no_dist=no_dist)
+                response = self._get("index", did, no_dist=no_dist)
             else:
-                response = self._get(did)
+                response = self._get("index", did)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
@@ -53,7 +64,16 @@ class IndexClient(object):
         return Document(self, did, json=response.json())
 
     def get(self, did):
-        """Return a document object corresponding to a single did"""
+        """
+        Makes a web request to the Indexd service to retrieve an index document record.
+
+        :param str did:
+            The UUID for the index record we want to retrieve.
+
+        :param str url:
+            *optional* Specify the dbGaP url
+        :returns: A Document object representing the index record
+        """
         try:
             response = self._get("index", did)
         except requests.HTTPError as e:
@@ -213,7 +233,7 @@ class Document(object):
                          headers={"content-type": "application/json"},
                          auth=self.client.auth,
                          data=json_dumps(self._doc_for_update()))
-        self.load()  # to sync new rev from server
+        self._load()  # to sync new rev from server
 
     def delete(self):
         self._check_deleted()
