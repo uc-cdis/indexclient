@@ -4,6 +4,9 @@ from urlparse import urljoin
 import requests
 
 
+UPDATABLE_ATTRS = ['file_name', 'urls', 'version']
+
+
 def json_dumps(data):
     return json.dumps({k: v for (k, v) in data.items() if v is not None})
 
@@ -25,7 +28,6 @@ class IndexClient(object):
         self.auth = auth
         self.url = baseurl
         self.version = version
-
 
     def url_for(self, *path):
         return urljoin(self.url, "/".join(path))
@@ -97,14 +99,16 @@ class IndexClient(object):
                     return
             params["start"] = json['ids'][-1]
 
-    def create(self, hashes, size, did=None, urls=None):
+    def create(self, hashes, size, did=None, urls=None, file_name=None, metadata=None):
         if urls is None:
             urls = []
         json = {
             "urls": urls,
             "form": "object",
             "hashes": hashes,
-            "size": size
+            "size": size,
+            "file_name": file_name,
+            "metadata": metadata
         }
         if did:
             json["did"] = did
@@ -122,7 +126,7 @@ class IndexClient(object):
             'release': release,
             'metastring': metastring,
             'host_authorities': host_authorities,
-            'keeper_authority': keeper_authority,
+            'keeper_authority': keeper_authority
         })
         url = '/alias/' + record
         headers = {'content-type': 'application/json'}
@@ -159,8 +163,6 @@ class Document(object):
     def __init__(self, client, did, json=None):
         self.client = client
         self.did = did
-        self.urls = None
-        self.sha1 = None
         self._fetched = False
         self._deleted = False
         self._load(json)
@@ -173,14 +175,7 @@ class Document(object):
         self._check_deleted()
         if not self._fetched:
             raise RuntimeError("Document must be fetched from the server before being rendered as json")
-        json = {
-            "urls": self.urls,
-            "hashes": self.hashes,
-            "size": self.size
-        }
-        if include_rev:
-            json["rev"] = self.rev
-        return json
+        return self._doc
 
     def to_json(self, include_rev=True):
         json = self._render(include_rev=include_rev)
@@ -191,23 +186,34 @@ class Document(object):
         """ Load the document contents from the server or from the provided dictionary """
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
-        assert json["did"] == self.did
-        self.urls = json["urls"]
-        self.rev = json["rev"]
-        self.size = json["size"]
-        self.hashes = json["hashes"]
+        # set attributes to current Document
+        for k,v in json.iteritems():
+            self.__dict__[k] = v
+        self._attrs = json.keys()
         self._fetched = True
+
+    def _doc_for_update(self):
+        """
+        return document with subset of attributes that are allowed
+        to be updated
+        """
+        return {k:v for k,v in self._doc.items() if k in UPDATABLE_ATTRS}
+
+    @property
+    def _doc(self):
+        return {k: self.__dict__[k] for k in self._attrs}
+
 
     def patch(self):
         """Patch the current document contents
         to be the new contents on the server"""
         self._check_deleted()
         self.client._put("/index", self.did,
-                           params={"rev": self.rev},
-                           headers={"content-type": "application/json"},
-                           auth=self.client.auth,
-                           data=json_dumps(self._render()))
-        self._load()  # to sync new rev from server
+                         params={"rev": self.rev},
+                         headers={"content-type": "application/json"},
+                         auth=self.client.auth,
+                         data=json_dumps(self._doc_for_update()))
+        self.load()  # to sync new rev from server
 
     def delete(self):
         self._check_deleted()

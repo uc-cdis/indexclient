@@ -4,8 +4,7 @@ import argparse
 
 import requests
 
-from index.errors import BaseIndexError
-
+from indexclient.errors import BaseIndexError
 
 
 def create_record(host, port, form, size, urls, hashes, **kwargs):
