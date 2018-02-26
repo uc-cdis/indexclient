@@ -52,9 +52,9 @@ class IndexClient(object):
         """
         try:
             if no_dist:
-                response = self._get("index", did, no_dist=no_dist)
+                response = self._get(did, no_dist=no_dist)
             else:
-                response = self._get("index", did)
+                response = self._get(did)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
