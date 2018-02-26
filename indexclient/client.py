@@ -60,8 +60,8 @@ class IndexClient(object):
             if e.response.status_code == 404:
                 return None
             else:
-                raise e 
-        
+                raise e
+
         return Document(self, did, json=response.json())
 
     def get_with_params(self, params=None):
