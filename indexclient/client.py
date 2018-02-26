@@ -52,7 +52,7 @@ class IndexClient(object):
         """
         try:
             if no_dist:
-                response = self._get(did, no_dist=no_dist)
+                response = self._get(did, params={'no_dist':''})
             else:
                 response = self._get(did)
         except requests.HTTPError as e:
