@@ -1,11 +1,7 @@
-import pytest
-
 # Python 2 and 3 compatible
 try:
-    from unittest.mock import MagicMock
     from unittest.mock import patch
 except ImportError:
-    from mock import MagicMock
     from mock import patch
 
 
