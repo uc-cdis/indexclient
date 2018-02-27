@@ -1,5 +1,8 @@
 import json
-from urlparse import urljoin
+try:
+    from urlparse import urljoin
+except ImportError:
+    from urllib.parse import urljoin
 
 import requests
 
@@ -205,7 +208,7 @@ class Document(object):
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
         # set attributes to current Document
-        for k,v in json.iteritems():
+        for k,v in json.items():
             self.__dict__[k] = v
         self._attrs = json.keys()
         self._fetched = True
