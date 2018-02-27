@@ -16,8 +16,9 @@ def test_import_index():
     import indexclient
 
 
+@patch("indexclient.client.handle_error")
 @patch("requests.get")
-def test_hashes(get_request_mock):
+def test_hashes(get_request_mock, handle_error_mock):
     from indexclient.client import IndexClient
     input_params = {
         'hashes': {

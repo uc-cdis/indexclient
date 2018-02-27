@@ -1,6 +1,9 @@
-import json
-from urlparse import urljoin
+from future.standard_library import install_aliases
+install_aliases()
 
+from urllib.parse import urljoin
+
+import json
 import requests
 import copy
 
