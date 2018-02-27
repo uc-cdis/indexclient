@@ -28,7 +28,6 @@ class IndexClient(object):
         self.auth = auth
         self.url = baseurl
         self.version = version
-        self.check_status()
 
     def url_for(self, *path):
         return urljoin(self.url, "/".join(path))
@@ -38,16 +37,50 @@ class IndexClient(object):
         resp = requests.get(self.url + '/index')
         handle_error(resp)
 
-    def get(self, did):
-        """Return a document object corresponding to a single did"""
+    def global_get(self, did, no_dist=False):
+        """
+        Makes a web request to the Indexd service global endpoint to retrieve
+        an index document record.
+
+        :param str did:
+            The UUID for the index record we want to retrieve.
+
+        :param boolean no_dist:
+            *optional* Specify if we want distributed search or not
+
+        :returns: A Document object representing the index record
+        """
         try:
-            self._get("index", did)
+            if no_dist:
+                response = self._get(did, params={'no_dist':''})
+            else:
+                response = self._get(did)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
             else:
                 raise e
-        return Document(self, did)
+
+        return Document(self, did, json=response.json())
+
+    def get(self, did):
+        """
+        Makes a web request to the Indexd service to retrieve an index document record.
+
+        :param str did:
+            The UUID for the index record we want to retrieve.
+
+        :returns: A Document object representing the index record
+        """
+        try:
+            response = self._get("index", did)
+        except requests.HTTPError as e:
+            if e.response.status_code == 404:
+                return None
+            else:
+                raise e
+
+        return Document(self, did, json=response.json())
 
     def get_with_params(self, params=None):
         """
@@ -145,12 +178,12 @@ class DocumentDeletedError(Exception):
 
 class Document(object):
 
-    def __init__(self, client, did):
+    def __init__(self, client, did, json=None):
         self.client = client
         self.did = did
         self._fetched = False
         self._deleted = False
-        self.refresh()
+        self._load(json)
 
     def _check_deleted(self):
         if self._deleted:
@@ -159,13 +192,23 @@ class Document(object):
     def _render(self, include_rev=True):
         self._check_deleted()
         if not self._fetched:
-            raise RuntimeError("Document must be fetched from server with doc.refresh() before being rendered as json")
+            raise RuntimeError("Document must be fetched from the server before being rendered as json")
         return self._doc
 
     def to_json(self, include_rev=True):
         json = self._render(include_rev=include_rev)
         json["did"] = self.did
         return json
+
+    def _load(self, json=None):
+        """ Load the document contents from the server or from the provided dictionary """
+        self._check_deleted()
+        json = json or self.client._get("index", self.did).json()
+        # set attributes to current Document
+        for k,v in json.iteritems():
+            self.__dict__[k] = v
+        self._attrs = json.keys()
+        self._fetched = True
 
     def _doc_for_update(self):
         """
@@ -178,15 +221,6 @@ class Document(object):
     def _doc(self):
         return {k: self.__dict__[k] for k in self._attrs}
 
-    def refresh(self):
-        """refresh the document contents from the server"""
-        self._check_deleted()
-        response = self.client._get("index", self.did).json()
-        # set attributes to current Document
-        for k,v in response.iteritems():
-            self.__dict__[k] = v
-        self._attrs = response.keys()
-        self._fetched = True
 
     def patch(self):
         """Patch the current document contents
@@ -197,7 +231,7 @@ class Document(object):
                          headers={"content-type": "application/json"},
                          auth=self.client.auth,
                          data=json_dumps(self._doc_for_update()))
-        self.refresh()  # to sync new rev from server
+        self._load()  # to sync new rev from server
 
     def delete(self):
         self._check_deleted()
