@@ -5,7 +5,7 @@ except ImportError:
     from urllib.parse import urljoin
 
 import requests
-
+import copy
 
 UPDATABLE_ATTRS = ['file_name', 'urls', 'version']
 
@@ -90,8 +90,20 @@ class IndexClient(object):
         Return a document object corresponding to the supplied parameters, such
         as ``{'hashes': {'md5': '...', 'size': '...'}}``.
         """
+        # need to include all the hashes in the request
+        # index client like signpost or indexd will need to handle the
+        # query param `'hash': 'hash_type:hash'`
+        params_copy = copy.deepcopy(params)
+        reformatted_params = dict()
+        if 'hashes' in params_copy:
+            reformatted_params['hash'] = []
+            for hash_type, hash in params_copy['hashes'].items():
+                reformatted_params['hash'].append(str(hash_type) + ':' + str(hash))
+            del params_copy['hashes']
+        reformatted_params.update(params_copy)
+
         try:
-            response = self._get("index", params=params)
+            response = self._get('index', params=reformatted_params)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
