@@ -88,18 +88,19 @@ class IndexClient(object):
     def get_with_params(self, params=None):
         """
         Return a document object corresponding to the supplied parameters, such
-        as ``{'hashes': {'md5': '...', 'size': '...'}}``.
+        as ``{'hashes': {'md5': '...'}, 'size': '...', 'metadata': {'file_state': '...'}}``.
         """
         # need to include all the hashes in the request
         # index client like signpost or indexd will need to handle the
-        # query param `'hash': 'hash_type:hash'`
+        # query param `'hashes': 'hash_type:hash'`
         params_copy = copy.deepcopy(params)
         reformatted_params = dict()
-        if 'hashes' in params_copy:
-            reformatted_params['hash'] = []
-            for hash_type, hash in params_copy['hashes'].items():
-                reformatted_params['hash'].append(str(hash_type) + ':' + str(hash))
-            del params_copy['hashes']
+        for param in ['hashes', 'metadata']:
+            if param in params_copy:
+                reformatted_params[param] = []
+                for k, v in params_copy[param].items():
+                    reformatted_params[param].append(str(k) + ':' + str(v))
+                del params_copy[param]
         reformatted_params.update(params_copy)
 
         try:

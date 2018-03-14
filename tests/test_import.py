@@ -24,7 +24,7 @@ def test_hashes(get_request_mock, handle_error_mock):
     }
 
     expected_format =  {
-        'hash': [
+        'hashes': [
             'md5:00000000000000000000000000000001'
         ],
         'size': '1'

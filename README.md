@@ -62,7 +62,7 @@ An example of one such record:
     "id": "119d292f-b786-421e-a8dd-72208e77c269",
     "rev": "dbee8496-5d03-4fbd-9115-6871c4ebf59f",
     "size": 512,
-    "hash": {
+    "hashes": {
         "md5": "e2a3a55aa1596f87f502c8ff29d74244",
         "sha1": "cb4e5ba5d30fd4667beba95bf73ea9d76ad3dcd4",
         "sha256": "20b599fa98f5f98e89e128ba6de3b65ff753c662721f368649fb8d7e7d4933b0"
