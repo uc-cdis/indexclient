@@ -85,7 +85,7 @@ class IndexClient(object):
 
         return Document(self, did, json=response.json())
 
-    def get_with_params(self, params=None):
+    def get_with_params(self, params={}):
         """
         Return a document object corresponding to the supplied parameters, such
         as ``{'hashes': {'md5': '...'}, 'size': '...', 'metadata': {'file_state': '...'}}``.
@@ -117,10 +117,26 @@ class IndexClient(object):
 
     def list(self, limit=float("inf"), start=None, page_size=100):
         """ Returns a generator of document objects. """
+        return self.list_with_params(limit, start, page_size)
+
+    def list_with_params(self, limit=float("inf"), start=None, page_size=100, params={}):
+        """
+        Return a generator of document object corresponding to the supplied parameters, such
+        as ``{'hashes': {'md5': '...'}, 'size': '...', 'metadata': {'file_state': '...'}}``.
+        """
+        params_copy = copy.deepcopy(params)
+        reformatted_params = dict()
+        for param in ['hashes', 'metadata']:
+            if param in params_copy:
+                reformatted_params[param] = []
+                for k, v in params_copy[param].items():
+                    reformatted_params[param].append(str(k) + ':' + str(v))
+                del params_copy[param]
+        reformatted_params.update(params_copy)
+        reformatted_params.update({"limit": page_size, "start": start})
         yielded = 0
-        params = {"limit": page_size, "start": start}
         while True:
-            resp = self._get("index", params=params)
+            resp = self._get("index", params=reformatted_params)
             handle_error(resp)
             json = resp.json()
             if not json["ids"]:
