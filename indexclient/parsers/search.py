@@ -42,7 +42,7 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
     params = {
         'limit': limit,
         'start': start,
-        'hashes': hashes,
+        'hash': hashes,
         'size': size,
     }
 

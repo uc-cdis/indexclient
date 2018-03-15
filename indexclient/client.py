@@ -85,23 +85,26 @@ class IndexClient(object):
 
         return Document(self, did, json=response.json())
 
-    def get_with_params(self, params={}):
+    def get_with_params(self, params=None):
         """
         Return a document object corresponding to the supplied parameters, such
         as ``{'hashes': {'md5': '...'}, 'size': '...', 'metadata': {'file_state': '...'}}``.
         """
         # need to include all the hashes in the request
         # index client like signpost or indexd will need to handle the
-        # query param `'hashes': 'hash_type:hash'`
-        params_copy = copy.deepcopy(params)
+        # query param `'hash': 'hash_type:hash'`
+        params_copy = copy.deepcopy(params) or {}
+        if 'hashes' in params_copy:
+            params_copy['hash'] = params_copy.pop('hashes')
         reformatted_params = dict()
-        for param in ['hashes', 'metadata']:
+        for param in ['hash', 'metadata']:
             if param in params_copy:
                 reformatted_params[param] = []
                 for k, v in params_copy[param].items():
                     reformatted_params[param].append(str(k) + ':' + str(v))
                 del params_copy[param]
         reformatted_params.update(params_copy)
+        reformatted_params['limit'] = 1
 
         try:
             response = self._get('index', params=reformatted_params)
@@ -119,14 +122,16 @@ class IndexClient(object):
         """ Returns a generator of document objects. """
         return self.list_with_params(limit, start, page_size)
 
-    def list_with_params(self, limit=float("inf"), start=None, page_size=100, params={}):
+    def list_with_params(self, limit=float("inf"), start=None, page_size=100, params=None):
         """
         Return a generator of document object corresponding to the supplied parameters, such
         as ``{'hashes': {'md5': '...'}, 'size': '...', 'metadata': {'file_state': '...'}}``.
         """
-        params_copy = copy.deepcopy(params)
+        params_copy = copy.deepcopy(params) or {}
+        if 'hashes' in params_copy:
+            params_copy['hash'] = params_copy.pop('hashes')
         reformatted_params = dict()
-        for param in ['hashes', 'metadata']:
+        for param in ['hash', 'metadata']:
             if param in params_copy:
                 reformatted_params[param] = []
                 for k, v in params_copy[param].items():
@@ -147,7 +152,11 @@ class IndexClient(object):
                     yielded += 1
                 else:
                     return
-            params["start"] = json['ids'][-1]
+            if len(json['ids']) == page_size:
+                params["start"] = json['ids'][-1]
+            else:
+                # There's no more results
+                return
 
     def create(self, hashes, size, did=None, urls=None, file_name=None, metadata=None):
         if urls is None:

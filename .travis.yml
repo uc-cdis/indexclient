@@ -10,4 +10,4 @@ install:
     - "pip install . --force --upgrade"
     - "pip install -r test-requirements.txt"
 
-script: "py.test -vv tests"
+script: "python -m pytest -vvvs tests"

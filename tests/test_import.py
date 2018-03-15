@@ -24,10 +24,11 @@ def test_hashes(get_request_mock, handle_error_mock):
     }
 
     expected_format =  {
-        'hashes': [
+        'hash': [
             'md5:00000000000000000000000000000001'
         ],
-        'size': '1'
+        'size': '1',
+        'limit': 1
     }
 
     with patch("indexclient.client.IndexClient._get") as get_mock:
