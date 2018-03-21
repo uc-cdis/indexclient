@@ -192,6 +192,58 @@ class IndexClient(object):
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
         return resp.json()
 
+    def get_latest_revision(self, did):
+        # type: (str) -> Document | None
+        doc = self._get("index", did, "latest").json()
+
+        if doc and "did" in doc:
+            return Document(self, doc["did"], doc)
+        return None
+
+    def auto_add_revision(self, did, version_incr_func=None):
+        """
+        Given a document id, retrieve the latest version and add a new revision with a version number incremented
+        using the passed function
+        The function must take in the latest version and returns an updated version
+        :type did: str
+        :param did: uuid of the index to be revised
+        :type version_incr_func: function[str] -> str
+        :param version_incr_func: if not function is specified, it simply increments the latest version by 1
+        :rtype: Document
+        :return: revised document
+        """
+
+        # get latest version
+        latest_doc = self.get_latest_revision(did)
+        if latest_doc.version is None:
+            latest_doc.version = 0
+
+        # update version
+        if version_incr_func is None:
+            latest_doc.version = str(int(latest_doc.version) + 1)
+        else:
+            latest_doc.version = version_incr_func(latest_doc.version)
+
+        # add and return revision
+        return self.add_revision(latest_doc)
+
+    def add_revision(self, index_doc):
+        # type: (Document) -> Document | None
+
+        rev_doc = self._post("index", index_doc.did, json=index_doc.to_json(), auth=self.auth).json()
+        if rev_doc and "did" in rev_doc:
+            return Document(self, rev_doc["did"])
+        return None
+
+    def list_versions(self, did):
+        # type: (str) -> list[Document]
+        version_dict = self._get("index", did, "versions").json()
+        versions = []
+
+        for _, version in version_dict.items():
+            versions.append(Document(self, version["did"], version))
+        return versions
+
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)
