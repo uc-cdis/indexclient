@@ -19,7 +19,7 @@ def handle_error(resp):
         try:
             json = resp.json()
             resp.reason = json["error"]
-        except KeyError or ValueError:
+        except KeyError:
             pass
         finally:
             resp.raise_for_status()
