@@ -206,12 +206,12 @@ class IndexClient(object):
             * retrieve the latest version
             * increment the version if function is specified
                 * using specified function
-            * create a revision with the updated version number
+            * create a revision
 
         Thr function should have the following signature
             * func(str) -> str
-        The use of this function is to cater for cases where the version numbering is more
-        complex than simply incrementing by 1
+        The use of this function is to cater for cases where the version numbering is
+        complex
         :type did: str
         :param did: document id of the index to be revised
         :type version_incr_func: function[str] -> str
