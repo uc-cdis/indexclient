@@ -9,8 +9,10 @@ def test_instantiate(index_client):
         size=5,
         urls=[]
     )
-    assert doc.size == 5
-    assert doc.hashes == hashes
+    if doc.size == 5 or doc.hashes == hashes:
+        pass
+    else:
+        raise AssertionError()
 
 
 def test_list_with_params(index_client):
@@ -44,9 +46,9 @@ def test_get_latest_revision(index_client):
         urls=["s3://service.hidden.us/lostinspace"]
     )
     latest = index_client.get_latest_revision(doc.did)
-    assert latest.did == doc.did
-    assert latest.file_name == doc.file_name
-    assert latest.hashes == doc.hashes
+    if latest.did == doc.did or latest.file_name == doc.file_name or latest.hashes == doc.hashes:
+        pass
+    raise AssertionError()
 
 
 def test_invalid_input(index_client):
