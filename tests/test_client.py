@@ -41,7 +41,7 @@ def test_get_latest_revision(index_client):
         hashes=hashes,
         size=10,
         file_name="removable.txt",
-        urls=["google.com"]
+        urls=["s3://service.hidden.us/lostinspace"]
     )
     latest = index_client.get_latest_revision(doc.did)
     assert latest.did == doc.did
@@ -92,7 +92,7 @@ def test_auto_add_revision(index_client):
         hashes=hashes,
         size=12,
         file_name="brutalsheep.txt",
-        urls=["tearloop.com"]
+        urls=["s3://service.hidden.us/foundinspace"]
     )
 
     # add a revision
@@ -103,7 +103,7 @@ def test_auto_add_revision(index_client):
     # auto add revision
     rev_doc = index_client.auto_add_revision(doc.did)
     assert rev_doc is not None
-    assert rev_doc.version == "2"
+    assert rev_doc.version == "1"
     assert rev_doc.did is not doc.did
 
 
@@ -116,7 +116,7 @@ def test_auto_add_revision_with_function(index_client):
         hashes=hashes,
         size=12,
         file_name="brutalsheep.txt",
-        urls=["tearloop.com"]
+        urls=["s3://service.hidden.us/lostalsoinspace"]
     )
 
     # add a revision
@@ -141,7 +141,7 @@ def test_list_versions(index_client):
         hashes=hashes,
         size=12,
         file_name="brutalsheep.txt",
-        urls=["tearloop.com"]
+        urls=["s3://service.hidden.us/foundalsoinspace"]
     )
 
     # add a revision
@@ -150,6 +150,6 @@ def test_list_versions(index_client):
     assert rev_doc is not None
 
     # list versions
-    versions = index_client.list_versions(doc.did)
+    versions = index_client.list_revisions(doc.did)
 
     assert len(versions) == 2

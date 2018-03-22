@@ -202,11 +202,18 @@ class IndexClient(object):
 
     def auto_add_revision(self, did, version_incr_func=None):
         """
-        Given a document id, retrieve the latest version and add a new revision with a version number incremented
-        using the passed function
-        The function must take in the latest version and returns an updated version
+        Given a document id,
+            * retrieve the latest version
+            * increment the version if function is specified
+                * using specified function
+            * create a revision with the updated version number
+
+        Thr function should have the following signature
+            * func(str) -> str
+        The use of this function is to cater for cases where the version numbering is more
+        complex than simply incrementing by 1
         :type did: str
-        :param did: uuid of the index to be revised
+        :param did: document id of the index to be revised
         :type version_incr_func: function[str] -> str
         :param version_incr_func: if not function is specified, it simply increments the latest version by 1
         :rtype: Document
@@ -215,13 +222,9 @@ class IndexClient(object):
 
         # get latest version
         latest_doc = self.get_latest_revision(did)
-        if latest_doc.version is None:
-            latest_doc.version = 0
 
-        # update version
-        if version_incr_func is None:
-            latest_doc.version = str(int(latest_doc.version) + 1)
-        else:
+        # update version if needed
+        if version_incr_func:
             latest_doc.version = version_incr_func(latest_doc.version)
 
         # add and return revision
@@ -235,12 +238,12 @@ class IndexClient(object):
             return Document(self, rev_doc["did"])
         return None
 
-    def list_versions(self, did):
+    def list_revisions(self, did):
         # type: (str) -> list[Document]
-        version_dict = self._get("index", did, "versions").json()
+        versions_dict = self._get("index", did, "versions").json()  # type: dict
         versions = []
 
-        for _, version in version_dict.items():
+        for _, version in versions_dict.items():
             versions.append(Document(self, version["did"], version))
         return versions
 
