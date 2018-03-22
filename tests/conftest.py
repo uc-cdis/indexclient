@@ -3,7 +3,7 @@ from cdisutilstest.code.conftest import indexd_server
 from indexclient.client import IndexClient
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def index_client(indexd_server):
     """
     Handles getting all the docs from an

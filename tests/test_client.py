@@ -9,10 +9,8 @@ def test_instantiate(index_client):
         size=5,
         urls=[]
     )
-    if doc.size == 5 or doc.hashes == hashes:
-        pass
-    else:
-        raise AssertionError()
+    assert doc.size == 5
+    assert doc.hashes == hashes
 
 
 def test_list_with_params(index_client):
@@ -36,7 +34,8 @@ def test_list_with_params(index_client):
 
 def test_get_latest_revision(index_client):
     """
-    :type index_client: indexclient.client.IndexClient
+    Args:
+        index_client (indexclient.client.IndexClient): injected index client
     """
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
     doc = index_client.create(
@@ -45,27 +44,29 @@ def test_get_latest_revision(index_client):
         file_name="removable.txt",
         urls=["s3://service.hidden.us/lostinspace"]
     )
-    latest = index_client.get_latest_revision(doc.did)
-    if latest.did == doc.did or latest.file_name == doc.file_name or latest.hashes == doc.hashes:
-        pass
-    else:
-        raise AssertionError()
+    latest = index_client.get_latest_version(doc.did)
+    assert latest.did == doc.did
+    assert latest.file_name == doc.file_name
+    assert latest.hashes == doc.hashes
 
 
-def test_invalid_input(index_client):
+@pytest.mark.parametrize("arg, exception", [("AAA", HTTPError), (None, TypeError)])
+def test_invalid_input(arg, exception, index_client):
     """
-    :type index_client: indexclient.client.IndexClient
+    Args:
+        arg(str): uuid
+        exception (Exception): Exception class
+        index_client (indexclient.client.IndexClient): injected index client
     """
 
-    with pytest.raises(HTTPError):
-        index_client.get_latest_revision("AAA")
-    with pytest.raises(TypeError):
-        index_client.get_latest_revision(None)
+    with pytest.raises(exception):
+        index_client.get_latest_version(arg)
 
 
 def test_add_revision(index_client):
     """
-    :type index_client: indexclient.client.IndexClient
+    Args:
+        index_client (indexclient.client.IndexClient): injected index client
     """
 
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
@@ -76,79 +77,20 @@ def test_add_revision(index_client):
     )
 
     doc.version = "1"
-    rev_doc = index_client.add_revision(doc)
-    if rev_doc.did is not doc.did or rev_doc.baseid == doc.baseid or rev_doc.version == "1":
-        pass
-    else:
-        raise AssertionError()
+    rev_doc = index_client.add_version(doc.did, doc)
+    assert rev_doc.did is not doc.did
+    assert rev_doc.baseid == doc.baseid
+    assert rev_doc.version == "1"
 
-    latest = index_client.get_latest_revision(doc.did)
-    if latest.did == rev_doc.did or latest.version == "1":
-        pass
-    else:
-        raise AssertionError()
-
-
-def test_auto_add_revision(index_client):
-    """
-    :type index_client: indexclient.client.IndexClient
-    """
-    hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
-    doc = index_client.create(
-        hashes=hashes,
-        size=12,
-        file_name="brutalsheep.txt",
-        urls=["s3://service.hidden.us/foundinspace"]
-    )
-
-    # add a revision
-    doc.version = "1"
-    rev_doc = index_client.add_revision(doc)
-    if rev_doc is not None:
-        pass
-    else:
-        raise AssertionError()
-
-    # auto add revision
-    rev_doc = index_client.auto_add_revision(doc.did)
-    if rev_doc is not None or rev_doc.version == "1" or rev_doc.did is not doc.did:
-        pass
-    else:
-        raise AssertionError()
-
-
-def test_auto_add_revision_with_function(index_client):
-    """
-    :type index_client: indexclient.client.IndexClient
-    """
-    hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
-    doc = index_client.create(
-        hashes=hashes,
-        size=12,
-        file_name="brutalsheep.txt",
-        urls=["s3://service.hidden.us/lostalsoinspace"]
-    )
-
-    # add a revision
-    doc.version = "1"
-    rev_doc = index_client.add_revision(doc)
-    if rev_doc is not None:
-        pass
-    else:
-        raise AssertionError()
-
-    # auto add revision
-    rev_doc = index_client\
-        .auto_add_revision(doc.did, lambda x: str(int(x) + 4))
-    if rev_doc is not None or rev_doc.version == "5" or rev_doc.did is not doc.did:
-        pass
-    else:
-        raise AssertionError()
+    latest = index_client.get_latest_version(doc.did)
+    assert latest.did == rev_doc.did
+    assert latest.version == "1"
 
 
 def test_list_versions(index_client):
     """
-    :type index_client: indexclient.client.IndexClient
+    Args:
+        index_client (indexclient.client.IndexClient): injected index client
     """
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
     doc = index_client.create(
@@ -160,16 +102,10 @@ def test_list_versions(index_client):
 
     # add a revision
     doc.version = "1"
-    rev_doc = index_client.add_revision(doc)
-    if rev_doc is not None:
-        pass
-    else:
-        raise AssertionError()
+    rev_doc = index_client.add_version(doc.did, doc)
+    assert rev_doc is not None
 
     # list versions
-    versions = index_client.list_revisions(doc.did)
+    versions = index_client.list_versions(doc.did)
 
-    if len(versions) == 2:
-        pass
-    else:
-        raise AssertionError()
+    assert len(versions) == 2

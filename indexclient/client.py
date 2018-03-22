@@ -192,7 +192,7 @@ class IndexClient(object):
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
         return resp.json()
 
-    def get_latest_revision(self, did):
+    def get_latest_version(self, did):
         # type: (str) -> Document | None
         doc = self._get("index", did, "latest").json()
 
@@ -200,45 +200,22 @@ class IndexClient(object):
             return Document(self, doc["did"], doc)
         return None
 
-    def auto_add_revision(self, did, version_incr_func=None):
-        """
-        Given a document id,
-            * retrieve the latest version
-            * increment the version if function is specified
-                * using specified function
-            * create a revision
-
-        Thr function should have the following signature
-            * func(str) -> str
-        The use of this function is to cater for cases where the version numbering is
-        complex
-        :type did: str
-        :param did: document id of the index to be revised
-        :type version_incr_func: function[str] -> str
-        :param version_incr_func: if not function is specified, it simply increments the latest version by 1
-        :rtype: Document
-        :return: revised document
+    def add_version(self, family_member_did, index_revision):
         """
 
-        # get latest version
-        latest_doc = self.get_latest_revision(did)
+        Args:
+            family_member_did (str): did of an existing family member
+            index_revision (Document): the document version to add to family
+        Return:
+            Document: the version that was just added
+        """
 
-        # update version if needed
-        if version_incr_func:
-            latest_doc.version = version_incr_func(latest_doc.version)
-
-        # add and return revision
-        return self.add_revision(latest_doc)
-
-    def add_revision(self, index_doc):
-        # type: (Document) -> Document | None
-
-        rev_doc = self._post("index", index_doc.did, json=index_doc.to_json(), auth=self.auth).json()
+        rev_doc = self._post("index", family_member_did, json=index_revision.to_json(), auth=self.auth).json()
         if rev_doc and "did" in rev_doc:
             return Document(self, rev_doc["did"])
         return None
 
-    def list_revisions(self, did):
+    def list_versions(self, did):
         # type: (str) -> list[Document]
         versions_dict = self._get("index", did, "versions").json()  # type: dict
         versions = []
