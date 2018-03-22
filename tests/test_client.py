@@ -48,7 +48,8 @@ def test_get_latest_revision(index_client):
     latest = index_client.get_latest_revision(doc.did)
     if latest.did == doc.did or latest.file_name == doc.file_name or latest.hashes == doc.hashes:
         pass
-    raise AssertionError()
+    else:
+        raise AssertionError()
 
 
 def test_invalid_input(index_client):
