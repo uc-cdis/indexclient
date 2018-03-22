@@ -19,7 +19,7 @@ def handle_error(resp):
         try:
             json = resp.json()
             resp.reason = json["error"]
-        except:
+        except :
             pass
         finally:
             resp.raise_for_status()
@@ -204,7 +204,7 @@ class IndexClient(object):
         """
 
         Args:
-            family_member_did (str): did of an existing family member
+            family_member_did (str): did of an existing index whose baseid will be shared
             index_revision (Document): the document version to add to family
         Return:
             Document: the version that was just added
