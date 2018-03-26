@@ -1,10 +1,9 @@
 import pytest
-from cdisutilstest.code.conftest import indexd_server
-from indexclient.client import IndexClient
+from cdisutilstest.code.conftest import indexd_server, indexd_client  # pylint: disable=unused-import
 
 
 @pytest.fixture(scope='function')
-def index_client(indexd_server):
+def index_client(indexd_client):
     """
     Handles getting all the docs from an
     indexing endpoint. Currently this is changing from
@@ -13,7 +12,4 @@ def index_client(indexd_server):
     tests:
     https://docs.pytest.org/en/latest/fixture.html#parametrizing-fixtures
     """
-    client = IndexClient(baseurl=indexd_server.baseurl, auth=indexd_server.auth)
-    yield client
-    for doc in client.list():
-        doc.delete()
+    return indexd_client

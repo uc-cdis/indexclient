@@ -1,6 +1,6 @@
 pytest==3.0.6
 mock
--e git+https://github.com/uc-cdis/cdisutils-test.git@0.2.1#egg=cdisutilstest
+-e git+https://github.com/uc-cdis/cdisutils-test.git@0.2.2#egg=cdisutilstest
 -e git+https://github.com/uc-cdis/cdis-python-utils.git@0.1.7#egg=cdispyutils
 -e git+https://github.com/uc-cdis/indexd.git@0.4.2#egg=indexd
 -e git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
