@@ -19,7 +19,7 @@ def handle_error(resp):
         try:
             json = resp.json()
             resp.reason = json["error"]
-        except:
+        except KeyError:
             pass
         finally:
             resp.raise_for_status()
@@ -191,6 +191,38 @@ class IndexClient(object):
         headers = {'content-type': 'application/json'}
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
         return resp.json()
+
+    def get_latest_version(self, did):
+        # type: (str) -> Document | None
+        doc = self._get("index", did, "latest").json()
+
+        if doc and "did" in doc:
+            return Document(self, doc["did"], doc)
+        return None
+
+    def add_version(self, family_member_did, index_revision):
+        """
+
+        Args:
+            family_member_did (str): did of an existing index whose baseid will be shared
+            index_revision (Document): the document version to add to family
+        Return:
+            Document: the version that was just added
+        """
+
+        rev_doc = self._post("index", family_member_did, json=index_revision.to_json(), auth=self.auth).json()
+        if rev_doc and "did" in rev_doc:
+            return Document(self, rev_doc["did"])
+        return None
+
+    def list_versions(self, did):
+        # type: (str) -> list[Document]
+        versions_dict = self._get("index", did, "versions").json()  # type: dict
+        versions = []
+
+        for _, version in versions_dict.items():
+            versions.append(Document(self, version["did"], version))
+        return versions
 
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
