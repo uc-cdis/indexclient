@@ -158,7 +158,25 @@ class IndexClient(object):
                 # There's no more results
                 return
 
-    def create(self, hashes, size, did=None, urls=None, file_name=None, metadata=None):
+    def create(
+            self, hashes, size, did=None, urls=None, file_name=None,
+            metadata=None, baseid=None):
+        """Create a new entry in indexd
+
+        Args:
+            hashes (dict): {hash type: hash value,}
+                eg ``hashes={'md5': ab167e49d25b488939b1ede42752458b'}``
+            size (int): file size metadata associated with a given uuid
+            did (str): provide a UUID for the new indexd to be made
+            urls (list): list of URLs where you can download the UUID
+            file_name (str): name of the file associated with a given UUID
+            metadata (dict): database table metadata
+            baseid (str): UUID to associate this new entry with
+
+        Returns:
+            Document: idnexclient representation of an entry in indexd
+        """
+
         if urls is None:
             urls = []
         json = {
@@ -167,7 +185,8 @@ class IndexClient(object):
             "hashes": hashes,
             "size": size,
             "file_name": file_name,
-            "metadata": metadata
+            "metadata": metadata,
+            "baseid": baseid,
         }
         if did:
             json["did"] = did
@@ -294,10 +313,13 @@ class Document(object):
     def _doc(self):
         return {k: self.__dict__[k] for k in self._attrs}
 
-
     def patch(self):
-        """Patch the current document contents
-        to be the new contents on the server"""
+        """Update attributes in an indexd Document
+
+        "Patch" the current document attributes then upload the
+        changed result to the indexd server.
+        """
+
         self._check_deleted()
         self.client._put("/index", self.did,
                          params={"rev": self.rev},

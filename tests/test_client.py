@@ -3,14 +3,21 @@ from requests import HTTPError
 
 
 def test_instantiate(index_client):
+    baseid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    urls = []
+    size = 5
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
     doc = index_client.create(
         hashes=hashes,
-        size=5,
-        urls=[]
+        size=size,
+        urls=urls,
+        baseid=baseid,
     )
     assert doc.size == 5
     assert doc.hashes == hashes
+    assert doc.size == size
+    assert doc.urls == urls
+    assert doc.baseid == baseid
 
 
 def test_list_with_params(index_client):
