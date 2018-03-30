@@ -39,7 +39,7 @@ def test_list_with_params(index_client):
         raise AssertionError()
 
 
-def test_get_latest_revision(index_client):
+def test_get_latest_version(index_client):
     """
     Args:
         index_client (indexclient.client.IndexClient): injected index client
@@ -70,7 +70,7 @@ def test_invalid_input(arg, exception, index_client):
         index_client.get_latest_version(arg)
 
 
-def test_add_revision(index_client):
+def test_add_version(index_client):
     """
     Args:
         index_client (indexclient.client.IndexClient): injected index client
@@ -107,7 +107,7 @@ def test_list_versions(index_client):
         urls=["s3://service.hidden.us/foundalsoinspace"]
     )
 
-    # add a revision
+    # add a version
     doc.version = "1"
     rev_doc = index_client.add_version(doc.did, doc)
     assert rev_doc is not None

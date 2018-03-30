@@ -7,7 +7,7 @@ except ImportError:
 import requests
 import copy
 
-UPDATABLE_ATTRS = ['file_name', 'urls', 'version']
+UPDATABLE_ATTRS = ['file_name', 'urls', 'version', 'metadata']
 
 
 def json_dumps(data):
@@ -174,7 +174,7 @@ class IndexClient(object):
             baseid (str): UUID to associate this new entry with
 
         Returns:
-            Document: idnexclient representation of an entry in indexd
+            Document: indexclient representation of an entry in indexd
         """
 
         if urls is None:
@@ -219,17 +219,17 @@ class IndexClient(object):
             return Document(self, doc["did"], doc)
         return None
 
-    def add_version(self, family_member_did, index_revision):
+    def add_version(self, current_did, new_doc):
         """
 
         Args:
-            family_member_did (str): did of an existing index whose baseid will be shared
-            index_revision (Document): the document version to add to family
+            current_did (str): did of an existing index whose baseid will be shared
+            new_doc (Document): the document version to add to family
         Return:
             Document: the version that was just added
         """
 
-        rev_doc = self._post("index", family_member_did, json=index_revision.to_json(), auth=self.auth).json()
+        rev_doc = self._post("index", current_did, json=new_doc.to_json(), auth=self.auth).json()
         if rev_doc and "did" in rev_doc:
             return Document(self, rev_doc["did"])
         return None
