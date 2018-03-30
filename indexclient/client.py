@@ -224,7 +224,7 @@ class IndexClient(object):
 
         Args:
             current_did (str): did of an existing index whose baseid will be shared
-            new_doc (Document): the document version to add to family
+            new_doc (Document): the document version to add
         Return:
             Document: the version that was just added
         """
