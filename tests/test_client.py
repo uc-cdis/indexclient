@@ -39,7 +39,7 @@ def test_list_with_params(index_client):
         raise AssertionError()
 
 
-def test_get_latest_revision(index_client):
+def test_get_latest_version(index_client):
     """
     Args:
         index_client (indexclient.client.IndexClient): injected index client
@@ -70,7 +70,7 @@ def test_invalid_input(arg, exception, index_client):
         index_client.get_latest_version(arg)
 
 
-def test_add_revision(index_client):
+def test_add_version(index_client):
     """
     Args:
         index_client (indexclient.client.IndexClient): injected index client
@@ -107,7 +107,7 @@ def test_list_versions(index_client):
         urls=["s3://service.hidden.us/foundalsoinspace"]
     )
 
-    # add a revision
+    # add a version
     doc.version = "1"
     rev_doc = index_client.add_version(doc.did, doc)
     assert rev_doc is not None
@@ -116,3 +116,24 @@ def test_list_versions(index_client):
     versions = index_client.list_versions(doc.did)
 
     assert len(versions) == 2
+
+
+def test_updating_metadata(index_client):
+    """
+    Args:
+        index_client (indexclient.client.IndexClient): injected index client
+    """
+    hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
+    doc = index_client.create(
+        hashes=hashes,
+        size=12,
+        file_name="brutalsheep.txt",
+        urls=["s3://service.hidden.us/foundalsoinspace"]
+    )
+
+    doc.metadata["dummy_field"] = "Dummy Var"
+    doc.patch()
+
+    same_doc = index_client.get(doc.did)
+    assert same_doc.metadata is not None
+    assert same_doc.metadata.get("dummy_field", None) == "Dummy Var"
