@@ -22,21 +22,26 @@ def test_instantiate(index_client):
 
 def test_list_with_params(index_client):
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
-    doc = index_client.create(
+    doc1 = index_client.create(
+        hashes=hashes,
+        size=1,
+        urls=[]
+    )
+    doc2 = index_client.create(
         hashes=hashes,
         size=1,
         urls=[]
     )
     docs_with_hashes = index_client.list_with_params(
+        page_size=1,
         params={'hashes': hashes}
     )
-    found = False
+    dids = [doc1.did, doc2.did]
+    found = []
     for d in docs_with_hashes:
-        if d.did == doc.did:
-            found = True
-            break
-    if not found:
-        raise AssertionError()
+        if d.did in dids:
+            found.append(d.did)
+    assert set(dids) == set(found)
 
 
 def test_get_latest_version(index_client):
