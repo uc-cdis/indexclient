@@ -153,7 +153,7 @@ class IndexClient(object):
                 else:
                     return
             if len(json['ids']) == page_size:
-                params["start"] = json['ids'][-1]
+                reformatted_params["start"] = json['ids'][-1]
             else:
                 # There's no more results
                 return
