@@ -291,7 +291,8 @@ class Document(object):
 
     def to_json(self, include_rev=True):
         json = self._render(include_rev=include_rev)
-        json["did"] = self.did
+        if self.did:
+            json["did"] = self.did
         return json
 
     def _load(self, json=None):
