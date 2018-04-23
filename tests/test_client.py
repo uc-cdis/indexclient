@@ -1,16 +1,20 @@
 import pytest
 from requests import HTTPError
 
+from indexclient.client import Document
+
 
 def test_instantiate(index_client):
     baseid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     urls = []
     size = 5
+    acl = ['a', 'b']
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
     doc = index_client.create(
         hashes=hashes,
         size=size,
         urls=urls,
+        acl=acl,
         baseid=baseid,
     )
     assert doc.size == 5
@@ -18,6 +22,7 @@ def test_instantiate(index_client):
     assert doc.size == size
     assert doc.urls == urls
     assert doc.baseid == baseid
+    assert doc.acl == acl
 
 
 def test_list_with_params(index_client):
@@ -88,8 +93,16 @@ def test_add_version(index_client):
         urls=[]
     )
 
-    doc.version = "1"
-    rev_doc = index_client.add_version(doc.did, doc)
+    data = {
+        k: v for k, v in doc._doc.items()
+        if k in ['size', 'hashes', 'form', 'urls']
+    }
+    data['version'] = '1'
+    new_doc = Document(
+        None, None, data
+    )
+
+    rev_doc = index_client.add_version(doc.did, new_doc)
     assert rev_doc.did is not doc.did
     assert rev_doc.baseid == doc.baseid
     assert rev_doc.version == "1"
@@ -113,8 +126,16 @@ def test_list_versions(index_client):
     )
 
     # add a version
-    doc.version = "1"
-    rev_doc = index_client.add_version(doc.did, doc)
+
+    data = {
+        k: v for k, v in doc._doc.items()
+        if k in ['size', 'hashes', 'form', 'urls']
+    }
+    data['version'] = '1'
+    new_doc = Document(
+        None, None, data
+    )
+    rev_doc = index_client.add_version(doc.did, new_doc)
     assert rev_doc is not None
 
     # list versions
@@ -142,3 +163,21 @@ def test_updating_metadata(index_client):
     same_doc = index_client.get(doc.did)
     assert same_doc.metadata is not None
     assert same_doc.metadata.get("dummy_field", None) == "Dummy Var"
+
+def test_updating_acl(index_client):
+    """
+    Args:
+        index_client (indexclient.client.IndexClient): injected index client
+    """
+    hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
+    doc = index_client.create(
+        hashes=hashes,
+        size=12,
+        urls=["s3://service.hidden.us/foundalsoinspace"]
+    )
+
+    doc.acl = ['a']
+    doc.patch()
+
+    same_doc = index_client.get(doc.did)
+    assert same_doc.acl == ['a']
