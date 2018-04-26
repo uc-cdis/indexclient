@@ -25,6 +25,25 @@ def test_instantiate(index_client):
     assert doc.acl == acl
 
 
+def test_create_with_metadata(index_client):
+    urls = ['s3://bucket/key']
+    urls_metadata = {'s3://bucket/key': {'k': 'v'}}
+    size = 5
+    acl = ['a', 'b']
+    hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
+    metadata = {'test': 'value'}
+    doc = index_client.create(
+        hashes=hashes,
+        size=size,
+        urls=urls,
+        acl=acl,
+        metadata=metadata,
+        urls_metadata=urls_metadata,
+    )
+    assert doc.urls_metadata == urls_metadata
+    assert doc.metadata == metadata
+
+
 def test_list_with_params(index_client):
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
     doc1 = index_client.create(
@@ -158,11 +177,13 @@ def test_updating_metadata(index_client):
     )
 
     doc.metadata["dummy_field"] = "Dummy Var"
+    doc.urls_metadata[doc.urls[0]] = {'a': 'b'}
     doc.patch()
 
     same_doc = index_client.get(doc.did)
     assert same_doc.metadata is not None
     assert same_doc.metadata.get("dummy_field", None) == "Dummy Var"
+    assert same_doc.urls_metadata == {doc.urls[0]: {'a': 'b'}}
 
 def test_updating_acl(index_client):
     """

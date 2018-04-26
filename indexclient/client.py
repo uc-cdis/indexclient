@@ -7,7 +7,10 @@ except ImportError:
 import requests
 import copy
 
-UPDATABLE_ATTRS = ['file_name', 'urls', 'version', 'metadata', 'acl']
+UPDATABLE_ATTRS = [
+    'file_name', 'urls', 'version',
+    'metadata', 'acl', 'urls_metadata'
+]
 
 
 def json_dumps(data):
@@ -160,7 +163,7 @@ class IndexClient(object):
 
     def create(
             self, hashes, size, did=None, urls=None, file_name=None,
-            metadata=None, baseid=None, acl=None):
+            metadata=None, baseid=None, acl=None, urls_metadata=None):
         """Create a new entry in indexd
 
         Args:
@@ -171,8 +174,9 @@ class IndexClient(object):
             urls (list): list of URLs where you can download the UUID
             acl (list): access control list
             file_name (str): name of the file associated with a given UUID
-            metadata (dict): database table metadata
-            baseid (str): UUID to associate this new entry with
+            metadata (dict): additional key value metadata for this entry
+            urls_metadata (dict): metadata attached to each url
+            baseid (str): optional baseid to group with previous entries versions
 
         Returns:
             Document: indexclient representation of an entry in indexd
@@ -187,6 +191,7 @@ class IndexClient(object):
             "size": size,
             "file_name": file_name,
             "metadata": metadata,
+            "urls_metadata": urls_metadata,
             "baseid": baseid,
             "acl": acl,
         }
