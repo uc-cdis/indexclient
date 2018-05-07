@@ -103,7 +103,7 @@ def create_test_index(index_client, version=None, current_did=None):
     did = str(uuid.uuid4())
 
     md5 = hashlib.md5()
-    md5.update(did)
+    md5.update(did.encode("utf-8"))
     # add a new node index
     hashes = {'md5': md5.hexdigest()}
 
