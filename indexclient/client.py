@@ -284,6 +284,19 @@ class Document(object):
         self._deleted = False
         self._load(json)
 
+    def __repr__(self):
+        """
+        String representation of a Document
+
+        Example:
+            <Document(size=1, form=object, file_name=filename.txt, ...)>
+        """
+        attributes = ', '.join([
+            '{}={}'.format(attr, self.__dict__[attr])
+            for attr in self._attrs
+        ])
+        return '<Document(' + attributes + ')>'
+
     def _check_deleted(self):
         if self._deleted:
             raise DocumentDeletedError("document {} has been deleted".format(self.did))
