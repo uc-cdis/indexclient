@@ -1,3 +1,6 @@
+import hashlib
+import uuid
+
 import pytest
 from requests import HTTPError
 
@@ -84,6 +87,62 @@ def test_get_latest_version(index_client):
     assert latest.did == doc.did
     assert latest.file_name == doc.file_name
     assert latest.hashes == doc.hashes
+
+
+def create_test_index(index_client, version=None, current_did=None):
+    """
+        Shorthand for creating new index entries for test purposes
+        Args:
+            index_client (indexclient.client.IndexClient):
+            version (str): version number of the index should be added
+            current_did (str): if specifed add a version of the index with the did = current_did
+        Returns:
+            indexclient.client.Document: versioned document
+        """
+
+    did = str(uuid.uuid4())
+
+    md5 = hashlib.md5()
+    md5.update(did)
+    # add a new node index
+    hashes = {'md5': md5.hexdigest()}
+
+    if current_did:
+        data = {
+            "size": 10,
+            "hashes": hashes,
+            "urls": [],
+            "form": "object",
+            "file_name": did + "_super_indexed_razzmatazz.xtx"
+        }
+        if version:
+            data["version"] = version
+        doc = index_client.add_version(current_did, Document(None, None, data))
+    else:
+        doc = index_client.create(
+            hashes=hashes,
+            size=5,
+            version=version if version else "",
+            file_name=did + "_super_indexed_razzmatazz.xtx",
+            urls=[]
+        )
+
+    return doc
+
+
+def test_get_latest_version_with_skip(index_client):
+    """
+    Args:
+        index_client (indexclient.client.IndexClient): injected index client
+    """
+    doc = create_test_index(index_client, version="1")
+    doc_2 = create_test_index(index_client, current_did=doc.did)
+    # doc_2 = create_test_index(index_client)
+
+    v_doc = index_client.get_latest_version(doc_2.did, skip_null_versions=True)
+    assert v_doc.did == doc.did
+    assert v_doc.version == doc.version
+    assert v_doc.baseid == doc_2.baseid
 
 
 @pytest.mark.parametrize("arg, exception", [("AAA", HTTPError), (None, TypeError)])
@@ -184,6 +243,7 @@ def test_updating_metadata(index_client):
     assert same_doc.metadata is not None
     assert same_doc.metadata.get("dummy_field", None) == "Dummy Var"
     assert same_doc.urls_metadata == {doc.urls[0]: {'a': 'b'}}
+
 
 def test_updating_acl(index_client):
     """
