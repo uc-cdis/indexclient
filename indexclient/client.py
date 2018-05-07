@@ -220,7 +220,13 @@ class IndexClient(object):
         return resp.json()
 
     def get_latest_version(self, did, skip_null_versions=False):
-        # type: (str, bool) -> Document | None
+        """
+        Args:
+            did (str): document id of an existing entry whose latest version is requested
+            skip_null_versions (bool): if True, exclude entries without a version
+        Returns:
+            Document: latest version of the entry
+        """
 
         params = {"has_version": "true" if skip_null_versions else "false"}
         doc = self._get("index", did, "latest", params=params).json()

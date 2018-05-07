@@ -137,7 +137,6 @@ def test_get_latest_version_with_skip(index_client):
     """
     doc = create_test_index(index_client, version="1")
     doc_2 = create_test_index(index_client, current_did=doc.did)
-    # doc_2 = create_test_index(index_client)
 
     v_doc = index_client.get_latest_version(doc_2.did, skip_null_versions=True)
     assert v_doc.did == doc.did
