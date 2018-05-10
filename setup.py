@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='indexclient',
-    version='1.4.3',
+    version='1.5.2',
     packages=[
         'indexclient',
         'indexclient.parsers',

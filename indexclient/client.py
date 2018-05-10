@@ -163,7 +163,7 @@ class IndexClient(object):
 
     def create(
             self, hashes, size, did=None, urls=None, file_name=None,
-            metadata=None, baseid=None, acl=None, urls_metadata=None):
+            metadata=None, baseid=None, acl=None, urls_metadata=None, version=None):
         """Create a new entry in indexd
 
         Args:
@@ -177,7 +177,7 @@ class IndexClient(object):
             metadata (dict): additional key value metadata for this entry
             urls_metadata (dict): metadata attached to each url
             baseid (str): optional baseid to group with previous entries versions
-
+            version (str): entry version string
         Returns:
             Document: indexclient representation of an entry in indexd
         """
@@ -194,6 +194,7 @@ class IndexClient(object):
             "urls_metadata": urls_metadata,
             "baseid": baseid,
             "acl": acl,
+            "version": version
         }
         if did:
             json["did"] = did
@@ -218,9 +219,17 @@ class IndexClient(object):
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
         return resp.json()
 
-    def get_latest_version(self, did):
-        # type: (str) -> Document | None
-        doc = self._get("index", did, "latest").json()
+    def get_latest_version(self, did, skip_null_versions=False):
+        """
+        Args:
+            did (str): document id of an existing entry whose latest version is requested
+            skip_null_versions (bool): if True, exclude entries without a version
+        Returns:
+            Document: latest version of the entry
+        """
+
+        params = {"has_version": "true" if skip_null_versions else "false"}
+        doc = self._get("index", did, "latest", params=params).json()
 
         if doc and "did" in doc:
             return Document(self, doc["did"], doc)
