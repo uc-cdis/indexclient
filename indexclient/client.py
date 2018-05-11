@@ -147,16 +147,16 @@ class IndexClient(object):
             resp = self._get("index", params=reformatted_params)
             handle_error(resp)
             json = resp.json()
-            if not json["ids"]:
+            if not json["records"]:
                 return
-            for did in json["ids"]:
+            for doc in json["records"]:
                 if yielded < limit:
-                    yield Document(self, did)
+                    yield Document(self, None, json=doc)
                     yielded += 1
                 else:
                     return
-            if len(json['ids']) == page_size:
-                reformatted_params["start"] = json['ids'][-1]
+            if len(json['records']) == page_size:
+                reformatted_params['start'] = json['records'][-1]['did']
             else:
                 # There's no more results
                 return
