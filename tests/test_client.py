@@ -25,8 +25,8 @@ def test_instantiate(index_client):
 
 
 def test_create_with_metadata(index_client):
-    urls = ['s3://s3-host.com/bucket/key']
-    urls_metadata = {'s3://s3-host.com/bucket/key': {'k': 'v'}}
+    urls = ['s3://bucket/key']
+    urls_metadata = {'s3://bucket/key': {'k': 'v'}}
     size = 5
     acl = ['a', 'b']
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
