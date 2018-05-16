@@ -58,7 +58,7 @@ class IndexClient(object):
         """
         try:
             if no_dist:
-                response = self._get(did, params={'no_dist':''})
+                response = self._get(did, params={'no_dist': ''})
             else:
                 response = self._get(did)
         except requests.HTTPError as e:
@@ -129,11 +129,17 @@ class IndexClient(object):
     def list_with_params(self, limit=float("inf"), start=None, page_size=100, params=None):
         """
         Return a generator of document object corresponding to the supplied parameters, such
-        as ``{'hashes': {'md5': '...'}, 'size': '...', 'metadata': {'file_state': '...'}}``.
+        as ``{'hashes': {'md5': '...'},
+              'size': '...',
+              'metadata': {'file_state': '...'},
+              'urls_metadata': {'s3://url': {'state': '...'}
+             }``.
         """
         params_copy = copy.deepcopy(params) or {}
         if 'hashes' in params_copy:
             params_copy['hash'] = params_copy.pop('hashes')
+        if 'urls_metadata' in params_copy:
+            params_copy['urls_metadata'] = json.dumps(params_copy.pop('urls_metadata'))
         reformatted_params = dict()
         for param in ['hash', 'metadata']:
             if param in params_copy:
