@@ -119,7 +119,8 @@ class IndexClient(object):
         if not response.json()['records']:
             return None
         json = response.json()['records'][0]
-        return Document(self, json=json)
+        did = json['did']
+        return Document(self, did, json=json)
 
     def list(self, limit=float("inf"), start=None, page_size=100):
         """ Returns a generator of document objects. """
