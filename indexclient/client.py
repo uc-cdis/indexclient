@@ -1,4 +1,3 @@
-import json
 try:
     from urlparse import urljoin
 except ImportError:
@@ -6,6 +5,7 @@ except ImportError:
 
 import requests
 import copy
+import json
 
 UPDATABLE_ATTRS = [
     'file_name', 'urls', 'version',
@@ -126,7 +126,7 @@ class IndexClient(object):
         """ Returns a generator of document objects. """
         return self.list_with_params(limit, start, page_size)
 
-    def list_with_params(self, limit=float("inf"), start=None, page_size=100, params=None):
+    def list_with_params(self, limit=float("inf"), start=None, page_size=100, params=None, negate_params=None):
         """
         Return a generator of document object corresponding to the supplied parameters, such
         as ``{'hashes': {'md5': '...'},
@@ -149,21 +149,23 @@ class IndexClient(object):
                 del params_copy[param]
         reformatted_params.update(params_copy)
         reformatted_params.update({"limit": page_size, "start": start})
+        if negate_params:
+            reformatted_params.update({"negate_params": json.dumps(negate_params)})
         yielded = 0
         while True:
             resp = self._get("index", params=reformatted_params)
             handle_error(resp)
-            json = resp.json()
-            if not json["records"]:
+            json_str = resp.json()
+            if not json_str["records"]:
                 return
-            for doc in json["records"]:
+            for doc in json_str["records"]:
                 if yielded < limit:
                     yield Document(self, None, json=doc)
                     yielded += 1
                 else:
                     return
-            if len(json['records']) == page_size:
-                reformatted_params['start'] = json['records'][-1]['did']
+            if len(json_str['records']) == page_size:
+                reformatted_params['start'] = json_str['records'][-1]['did']
             else:
                 # There's no more results
                 return

@@ -60,6 +60,22 @@ def test_list_with_params(index_client):
     assert set(dids) == set(found)
 
 
+def test_list_with_params_negate(index_client):
+    doc1 = create_random_index(index_client, version='1'
+                               )
+    create_random_index(index_client, version='2')
+
+    docs = index_client.list_with_params(
+        negate_params={'version': '2'}
+    )
+
+    dids = {record.did for record in docs}
+    assert dids == {doc1.did}
+
+
+
+
+
 def test_get_latest_version(index_client):
     """
     Args:
