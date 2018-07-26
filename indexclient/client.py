@@ -360,7 +360,7 @@ class Document(object):
         """
 
         self._check_deleted()
-        self.client._put("/index", self.did,
+        self.client._put("index", self.did,
                          params={"rev": self.rev},
                          headers={"content-type": "application/json"},
                          auth=self.client.auth,
@@ -369,7 +369,7 @@ class Document(object):
 
     def delete(self):
         self._check_deleted()
-        self.client._delete("/index", self.did,
+        self.client._delete("index", self.did,
                             auth=self.client.auth,
                             params={"rev": self.rev})
         self._deleted = True
