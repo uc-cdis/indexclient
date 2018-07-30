@@ -1,0 +1,11 @@
+[tool.poetry]
+name = "indexclient"
+version = "0.1.0"
+description = ""
+authors = ["Justin Barnowski <jbarno@uchicago.edu>"]
+
+[tool.poetry.dependencies]
+python = "*"
+requests = ">=2.5.2,<3.0.0'"
+    
+[tool.poetry.dev-dependencies]
