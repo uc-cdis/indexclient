@@ -1,6 +1,9 @@
 import pytest
+from cdisutilstest.code.indexd_fixture import (
+    create_random_index,
+    create_random_index_version,
+)
 from requests import HTTPError
-from cdisutilstest.code.indexd_fixture import create_random_index, create_random_index_version
 
 
 def test_instantiate(index_client):
@@ -177,3 +180,14 @@ def test_updating_acl(index_client):
 
     same_doc = index_client.get(doc.did)
     assert same_doc.acl == ['a']
+
+
+def test_bulk_request(index_client):
+    dids = [
+        create_random_index(index_client).did
+        for _ in range(20)
+    ]
+
+    docs = index_client.bulk_request(dids)
+    for doc in docs:
+        assert doc.did in dids

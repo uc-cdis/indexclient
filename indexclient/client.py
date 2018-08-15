@@ -3,9 +3,10 @@ try:
 except ImportError:
     from urllib.parse import urljoin
 
-import requests
 import copy
 import json
+
+import requests
 
 UPDATABLE_ATTRS = [
     'file_name', 'urls', 'version',
@@ -87,6 +88,32 @@ class IndexClient(object):
                 raise e
 
         return Document(self, did, json=response.json())
+
+    def bulk_request(self, dids):
+        """
+        bulk_get makes one http request to the indexd service and retrieves
+        a list of Documents based on the dids provided.
+
+        Args:
+            dids (list): list of dids for potential documents
+
+        Returns:
+            list: Document objects representing  index records
+        """
+
+        headers = {'content-type': 'application/json'}
+        try:
+            response = self._post("bulk/documents", json=dids, headers=headers)
+        except requests.HTTPError as exception:
+            if exception.response.status_code == 404:
+                return None
+            else:
+                raise exception
+
+        return [
+            Document(self, doc['did'], json=doc)
+            for doc in response.json()
+        ]
 
     def get_with_params(self, params=None):
         """
