@@ -15,7 +15,7 @@ UPDATABLE_ATTRS = [
 
 
 def json_dumps(data):
-    return json.dumps({k: v for (k, v) in data.items() if v is not None})
+    return json.dumps({k: v for (k, v) in data.items()})
 
 
 def handle_error(resp):
