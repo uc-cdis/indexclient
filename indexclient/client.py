@@ -15,7 +15,7 @@ UPDATABLE_ATTRS = [
 
 
 def json_dumps(data):
-    return json.dumps({k: v for (k, v) in data.items()})
+    return json.dumps({k: v for (k, v) in data.items() if v is not None})
 
 
 def handle_error(resp):
@@ -391,7 +391,7 @@ class Document(object):
                          params={"rev": self.rev},
                          headers={"content-type": "application/json"},
                          auth=self.client.auth,
-                         data=json_dumps(self._doc_for_update()))
+                         data=json.dumps(self._doc_for_update()))
         self._load()  # to sync new rev from server
 
     def delete(self):
