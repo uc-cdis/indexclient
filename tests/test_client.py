@@ -8,7 +8,8 @@ from requests import HTTPError
 
 def test_instantiate(index_client):
     baseid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-    urls = []
+    urls = ['s3://url/bucket/key']
+    urls_metadata={url: {'state': 'doing ok'} for url in urls}
     size = 5
     acl = ['a', 'b']
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
@@ -18,12 +19,14 @@ def test_instantiate(index_client):
         urls=urls,
         acl=acl,
         baseid=baseid,
+        urls_metadata=urls_metadata,
     )
     assert doc.size == 5
     assert doc.hashes == hashes
     assert doc.size == size
     assert doc.urls == urls
     assert doc.baseid == baseid
+    assert doc.urls_metadata == urls_metadata
     assert doc.acl == acl
 
 
