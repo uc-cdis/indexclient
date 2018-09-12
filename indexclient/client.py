@@ -295,6 +295,31 @@ class IndexClient(object):
             versions.append(Document(self, version["did"], version))
         return versions
 
+    def query_urls_metadata(self, url, key, value, fields=None, version=False, limit=100, offset="0"):
+        params = {
+            "url": url,
+            "key": key,
+            "value": value,
+            "fields": fields,
+            "version": version,
+            "limit": limit,
+            "offset": offset
+        }
+        resp = self._get("index/urls/metadata/q", params=params)
+        return resp.json()
+
+    def query_url(self, exclude=None, include=None, version=False, fields=None, limit=100, offset="0"):
+        params = {
+            "exclude": exclude,
+            "include": include,
+            "version": version,
+            "fields": fields,
+            "limit": limit,
+            "offset": offset
+        }
+        resp = self._get("index/urls/q", params=params)
+        return resp.json()
+
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)
