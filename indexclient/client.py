@@ -295,29 +295,29 @@ class IndexClient(object):
             versions.append(Document(self, version["did"], version))
         return versions
 
-    def query_urls_metadata(self, url, key, value, fields=None, version=False, limit=100, offset="0"):
+    def query_urls_metadata(self, url, key, value, fields=None, versioned=False, limit=100, offset="0"):
         params = {
             "url": url,
             "key": key,
             "value": value,
             "fields": fields,
-            "version": version,
+            "versioned": versioned,
             "limit": limit,
             "offset": offset
         }
-        resp = self._get("index/urls/metadata/q", params=params)
+        resp = self._get("_query/urls/metadata/q", params=params)
         return resp.json()
 
-    def query_url(self, exclude=None, include=None, version=False, fields=None, limit=100, offset="0"):
+    def query_url(self, exclude=None, include=None, versioned=False, fields=None, limit=100, offset="0"):
         params = {
             "exclude": exclude,
             "include": include,
-            "version": version,
+            "versioned": versioned,
             "fields": fields,
             "limit": limit,
             "offset": offset
         }
-        resp = self._get("index/urls/q", params=params)
+        resp = self._get("_query/urls/q", params=params)
         return resp.json()
 
     def _get(self, *path, **kwargs):
