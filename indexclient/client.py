@@ -329,6 +329,12 @@ class Document(object):
         self._deleted = False
         self._load(json)
 
+    def __eq__(self, other_doc):
+        return self._doc == other_doc._doc
+
+    def __ne__(self, other_doc):
+        return self._doc != other_doc._doc
+
     def __repr__(self):
         """
         String representation of a Document
