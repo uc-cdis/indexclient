@@ -330,9 +330,25 @@ class Document(object):
         self._load(json)
 
     def __eq__(self, other_doc):
+        """
+        equals `==` operator overload
+
+        It doesn't matter the order of the urls list. What matters is the
+        existence of the urls are the same on both sides.
+        """
+        self.__dict__['urls'] = sorted(self.__dict__['urls'])
+        other_doc.__dict__['urls'] = sorted(other_doc.__dict__['urls'])
         return self._doc == other_doc._doc
 
     def __ne__(self, other_doc):
+        """
+        not equals `!=` operator overload
+
+        It doesn't matter the order of the urls list. What matters is the
+        existence of the urls are the same on both sides.
+        """
+        self.__dict__['urls'] = sorted(self.__dict__['urls'])
+        other_doc.__dict__['urls'] = sorted(other_doc.__dict__['urls'])
         return self._doc != other_doc._doc
 
     def __repr__(self):
