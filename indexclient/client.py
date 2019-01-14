@@ -351,6 +351,12 @@ class Document(object):
         other_doc.__dict__['urls'] = sorted(other_doc.__dict__['urls'])
         return self._doc != other_doc._doc
 
+    def __lt__(self, other_doc):
+        return self.did < other_doc.did
+
+    def __gt__(self, other_doc):
+        return self.did > other_doc.did
+
     def __repr__(self):
         """
         String representation of a Document
