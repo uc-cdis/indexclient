@@ -79,9 +79,6 @@ def test_list_with_params_negate(index_client):
     assert dids == {doc1.did}
 
 
-
-
-
 def test_get_latest_version(index_client):
     """
     Args:
