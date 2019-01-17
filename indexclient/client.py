@@ -330,10 +330,28 @@ class Document(object):
         self._load(json)
 
     def __eq__(self, other_doc):
-        return self._doc == other_doc._doc
+        """
+        equals `==` operator overload
+
+        It doesn't matter the order of the urls list. What matters is the
+        existence of the urls are the same on both sides.
+        """
+        return self._sorted_doc == other_doc._sorted_doc
 
     def __ne__(self, other_doc):
-        return self._doc != other_doc._doc
+        """
+        not equals `!=` operator overload
+
+        It doesn't matter the order of the urls list. What matters is the
+        existence of the urls are the same on both sides.
+        """
+        return self._sorted_doc != other_doc._sorted_doc
+
+    def __lt__(self, other_doc):
+        return self.did < other_doc.did
+
+    def __gt__(self, other_doc):
+        return self.did > other_doc.did
 
     def __repr__(self):
         """
@@ -385,6 +403,15 @@ class Document(object):
     def _doc(self):
         return {k: self.__dict__[k] for k in self._attrs}
 
+    @property
+    def _sorted_doc(self):
+        """Return the _doc object but with all arrays in sorted order.
+
+        This will allow us to compare dictionaries with lists correctly. We
+        only care about the contents of the arrays not the order of them.
+        """
+        return recursive_sort(self._doc)
+
     def patch(self):
         """Update attributes in an indexd Document
 
@@ -406,3 +433,19 @@ class Document(object):
                             auth=self.client.auth,
                             params={"rev": self.rev})
         self._deleted = True
+
+
+def recursive_sort(value):
+    """
+    Sort all the lists in the dictionary recursively so that we can compare a
+    dictionary's contents being the same instead of comparing their order.
+    """
+    if isinstance(value, dict):
+        return {
+            key: recursive_sort(value[key])
+            for key in value.keys()
+        }
+    elif isinstance(value, list):
+        return sorted([recursive_sort(element) for element in value])
+    else:
+        return value
