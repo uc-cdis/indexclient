@@ -57,6 +57,7 @@ docs/_build/
 
 #venv
 .venv*/
+.python-version
 
 #.swp
 *.swp
@@ -66,3 +67,6 @@ settings.yaml
 
 # sqlite
 *.sq3
+
+# PyCharm
+.idea/

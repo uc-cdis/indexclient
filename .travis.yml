@@ -11,3 +11,12 @@ install:
     - "pip install -r test-requirements.txt"
 
 script: "python -m pytest -vvvs tests"
+
+deploy:
+  provider: pypi
+  user: uc-ctds
+  skip_existing: true
+  on:
+    tags: true
+  password:
+    secure: iIBWBSa4az6Gxbf1508txyOD8zb+V6JN7euw7RVl3wRiijvMrMsRRinzfUUdCjjA+UqBAO++Jve8E0B7awNbJ13A4CWeECGm6yTNYRWk42x9VQFq3UhUVqW4Yd4i3l8IH98GDdfxI+HdhDMCLN++YUL//qOuoveWIaI5rYNUKwPztZpG+4c4Yymg5D7VGsSrVmKEsUVt2K/Z6XRiPFWcCGmn/7APirLa48hKeYXPew8ddvU9IWMx0JETzIShPN7YA3NPIYLrSj6C+d4duxQ9TtWKbZkPMzhDdskrIp3Mteb0HaPHzGJcFKH77fi9D2OhNKrmvMeCM7WKnFTdHKDVuY41hu2F+l1UN4o1ZneKgYS3ZL4QDPyVosrKOr4T493Ckisbcg7xeJBUKi2zIV8KtEfO4hH/3U6gc0C76uV1z1/uyyyEAbrORd1J2FfJLIbTBu3hq7JEZvKrP3W72My+BbwV5t/nq09FDuApzHG7640m9gvKndgmEpw5bYoqpqlrkhRyTZBDbrdDN7ZDDnASExZnufCmRsCQMCaIL1tyyR9ibs2fydlk4WO5NtZY5HZI1vZPRHTrkIPp8UGtJP3lmogU/9FiCAqscDXdHX3clRUcF2fQ7oNiCH9ZfcQuo9yPv/5EK8B77ltwi3n9+/AbapsrpFbu52V9+P6nDtNTZag=
