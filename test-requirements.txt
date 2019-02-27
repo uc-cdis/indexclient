@@ -2,7 +2,7 @@ pytest==3.0.6
 mock
 -e git+https://github.com/uc-cdis/cdisutils-test.git@0.2.3#egg=cdisutilstest
 -e git+https://github.com/uc-cdis/cdis-python-utils.git@0.1.7#egg=cdispyutils
--e git+https://github.com/NCI-GDC/indexd.git@feat/GP-13-relax-update-contraint#egg=indexd
+-e git+https://github.com/NCI-GDC/indexd.git@release/oobleck#egg=indexd # to be updated to tag
 -e git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
 -e git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient
 -e git+https://github.com/uc-cdis/cdislogging.git@0.0.2#egg=cdislogging
