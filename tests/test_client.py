@@ -181,6 +181,7 @@ def test_updating_acl(index_client):
     same_doc = index_client.get(doc.did)
     assert same_doc.acl == ['a']
 
+
 def test_updating_hashes(index_client):
     """
     Args:
@@ -194,6 +195,20 @@ def test_updating_hashes(index_client):
 
     same_doc = index_client.get(doc.did)
     assert same_doc.hashes['md5'] == new_hash
+
+
+def test_updating_size(index_client):
+    """
+    Args:
+        index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
+    """
+    doc = create_random_index(index_client)
+
+    doc.size = 123
+    doc.patch()
+
+    same_doc = index_client.get(doc.did)
+    assert same_doc.size == 123
 
 
 def test_bulk_request(index_client):
