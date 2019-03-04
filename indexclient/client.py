@@ -10,7 +10,8 @@ import requests
 
 UPDATABLE_ATTRS = [
     'file_name', 'urls', 'version',
-    'metadata', 'acl', 'urls_metadata'
+    'metadata', 'acl', 'urls_metadata',
+    'hashes', 'size'
 ]
 
 
