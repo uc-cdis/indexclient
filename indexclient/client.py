@@ -8,6 +8,8 @@ import json
 
 import requests
 
+MAX_RETRIES = 10
+
 UPDATABLE_ATTRS = [
     'file_name', 'urls', 'version',
     'metadata', 'acl', 'urls_metadata'
@@ -180,8 +182,16 @@ class IndexClient(object):
             reformatted_params.update({"negate_params": json.dumps(negate_params)})
         yielded = 0
         while True:
-            resp = self._get("index", params=reformatted_params)
-            handle_error(resp)
+            tries = 0
+            while tries < MAX_RETRIES:
+                try:
+                    resp = self._get("index", params=reformatted_params, timeout=60)
+                    handle_error(resp)
+                    break
+                except requests.exceptions.ReadTimeout:
+                    tries +=1
+                    if tries == MAX_RETRIES:
+                        raise
             json_str = resp.json()
             if not json_str["records"]:
                 return
