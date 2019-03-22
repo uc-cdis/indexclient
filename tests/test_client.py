@@ -1,5 +1,5 @@
 import pytest
-from cdisutilstest.code.indexd_fixture import (
+from indexd_test_utils import (
     create_random_index,
     create_random_index_version,
 )
@@ -9,7 +9,7 @@ from requests import HTTPError
 def test_instantiate(index_client):
     baseid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
     urls = ['s3://url/bucket/key']
-    urls_metadata={url: {'state': 'doing ok'} for url in urls}
+    urls_metadata = {url: {'state': 'doing ok'} for url in urls}
     size = 5
     acl = ['a', 'b']
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
@@ -188,7 +188,7 @@ def test_updating_hashes(index_client):
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
     doc = create_random_index(index_client, hashes={'md5': '3e8335931696df6261d8d437139d0463'})
-    
+
     new_hash = '2a6f7de6a11b8adafc5dc55646978142'
     doc.hashes['md5'] = new_hash
     doc.patch()
