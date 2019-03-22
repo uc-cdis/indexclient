@@ -1,5 +1,13 @@
 import pytest
-from cdisutilstest.code.conftest import indexd_server, indexd_client  # pylint: disable=unused-import
+from indexd_test_utils import (
+    alias_driver,
+    auth_driver,
+    create_indexd_tables,
+    index_driver,
+    indexd_client,
+    indexd_server,
+    setup_indexd_test_database,
+)
 
 
 @pytest.fixture(scope='function')
