@@ -31,9 +31,16 @@ def handle_error(resp):
             resp.raise_for_status()
 
 
-def indexd_request_wrapper(func):
+def timeout_wrapper(func):
+    def timeout(*args, **kwargs):
+        kwargs.setdefault("timeout", 60)
+        return func(*args, **kwargs)
+    return timeout
+
+
+def retry_and_timeout_wrapper(func):
     def retry_logic_with_timeout(*args, **kwargs):
-        kwargs.update({"timeout": 60})
+        kwargs.setdefault("timeout", 60)
         retries = 0
         while retries < MAX_RETRIES:
             try:
@@ -311,25 +318,25 @@ class IndexClient(object):
             versions.append(Document(self, version["did"], version))
         return versions
 
-    @indexd_request_wrapper
+    @retry_and_timeout_wrapper
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
-    @indexd_request_wrapper
+    @timeout_wrapper
     def _post(self, *path, **kwargs):
         resp = requests.post(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
-    @indexd_request_wrapper
+    @timeout_wrapper
     def _put(self, *path, **kwargs):
         resp = requests.put(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
-    @indexd_request_wrapper
+    @timeout_wrapper
     def _delete(self, *path, **kwargs):
         resp = requests.delete(self.url_for(*path), **kwargs)
         handle_error(resp)
