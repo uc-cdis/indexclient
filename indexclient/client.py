@@ -31,6 +31,27 @@ def handle_error(resp):
             resp.raise_for_status()
 
 
+def timeout_wrapper(func):
+    def timeout(*args, **kwargs):
+        kwargs.setdefault("timeout", 60)
+        return func(*args, **kwargs)
+    return timeout
+
+
+def retry_and_timeout_wrapper(func):
+    def retry_logic_with_timeout(*args, **kwargs):
+        kwargs.setdefault("timeout", 60)
+        retries = 0
+        while retries < MAX_RETRIES:
+            try:
+                return func(*args, **kwargs)
+            except requests.exceptions.ReadTimeout:
+                retries +=1
+                if retries == MAX_RETRIES:
+                    raise
+
+    return retry_logic_with_timeout
+
 class IndexClient(object):
 
     def __init__(self, baseurl, version="v0", auth=None):
@@ -182,16 +203,8 @@ class IndexClient(object):
             reformatted_params.update({"negate_params": json.dumps(negate_params)})
         yielded = 0
         while True:
-            tries = 0
-            while tries < MAX_RETRIES:
-                try:
-                    resp = self._get("index", params=reformatted_params, timeout=60)
-                    handle_error(resp)
-                    break
-                except requests.exceptions.ReadTimeout:
-                    tries +=1
-                    if tries == MAX_RETRIES:
-                        raise
+            resp = self._get("index", params=reformatted_params, timeout=60)
+            handle_error(resp)
             json_str = resp.json()
             if not json_str["records"]:
                 return
@@ -305,21 +318,25 @@ class IndexClient(object):
             versions.append(Document(self, version["did"], version))
         return versions
 
+    @retry_and_timeout_wrapper
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
+    @timeout_wrapper
     def _post(self, *path, **kwargs):
         resp = requests.post(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
+    @timeout_wrapper
     def _put(self, *path, **kwargs):
         resp = requests.put(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
 
+    @timeout_wrapper
     def _delete(self, *path, **kwargs):
         resp = requests.delete(self.url_for(*path), **kwargs)
         handle_error(resp)
