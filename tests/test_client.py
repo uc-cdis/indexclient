@@ -12,12 +12,14 @@ def test_instantiate(index_client):
     urls_metadata={url: {'state': 'doing ok'} for url in urls}
     size = 5
     acl = ['a', 'b']
+    rbac = '/gen3/programs/a/projects/b'
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
     doc = index_client.create(
         hashes=hashes,
         size=size,
         urls=urls,
         acl=acl,
+        rbac=rbac,
         baseid=baseid,
         urls_metadata=urls_metadata,
     )
@@ -28,6 +30,7 @@ def test_instantiate(index_client):
     assert doc.baseid == baseid
     assert doc.urls_metadata == urls_metadata
     assert doc.acl == acl
+    assert doc.rbac == rbac
 
 
 def test_create_with_metadata(index_client):
@@ -35,6 +38,7 @@ def test_create_with_metadata(index_client):
     urls_metadata = {'s3://bucket/key': {'k': 'v'}}
     size = 5
     acl = ['a', 'b']
+    rbac = '/gen3/programs/a/projects/b'
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
     metadata = {'test': 'value'}
     doc = index_client.create(
@@ -42,6 +46,7 @@ def test_create_with_metadata(index_client):
         size=size,
         urls=urls,
         acl=acl,
+        rbac=rbac,
         metadata=metadata,
         urls_metadata=urls_metadata,
     )
@@ -180,6 +185,20 @@ def test_updating_acl(index_client):
 
     same_doc = index_client.get(doc.did)
     assert same_doc.acl == ['a']
+
+
+def test_updating_rbac(index_client):
+    """
+    Args:
+        index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
+    """
+    doc = create_random_index(index_client)
+
+    doc.rbac = '/gen3/programs/a'
+    doc.patch()
+
+    same_doc = index_client.get(doc.did)
+    assert same_doc.rbac == '/gen3/programs/a'
 
 
 def test_bulk_request(index_client):

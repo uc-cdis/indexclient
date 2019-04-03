@@ -12,7 +12,7 @@ MAX_RETRIES = 10
 
 UPDATABLE_ATTRS = [
     'file_name', 'urls', 'version',
-    'metadata', 'acl', 'urls_metadata'
+    'metadata', 'acl', 'rbac', 'urls_metadata'
 ]
 
 
@@ -222,7 +222,8 @@ class IndexClient(object):
 
     def create(
             self, hashes, size, did=None, urls=None, file_name=None,
-            metadata=None, baseid=None, acl=None, urls_metadata=None, version=None):
+            metadata=None, baseid=None, acl=None, urls_metadata=None, version=None,
+            rbac=None):
         """Create a new entry in indexd
 
         Args:
@@ -232,6 +233,7 @@ class IndexClient(object):
             did (str): provide a UUID for the new indexd to be made
             urls (list): list of URLs where you can download the UUID
             acl (list): access control list
+            rbac (str): RBAC string
             file_name (str): name of the file associated with a given UUID
             metadata (dict): additional key value metadata for this entry
             urls_metadata (dict): metadata attached to each url
@@ -253,6 +255,7 @@ class IndexClient(object):
             "urls_metadata": urls_metadata,
             "baseid": baseid,
             "acl": acl,
+            "rbac": rbac,
             "version": version
         }
         if did:
