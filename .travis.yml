@@ -6,6 +6,9 @@ python:
 
 sudo: false
 
+addons:
+  postgresql: '9.4'
+
 install:
     - "pip install . --force --upgrade"
     - "pip install -r test-requirements.txt"
