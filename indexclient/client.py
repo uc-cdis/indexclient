@@ -97,7 +97,6 @@ class IndexClient(object):
 
         Args:
             dids (list): list of dids for potential documents
-
         Returns:
             list: Document objects representing  index records
         """
@@ -111,6 +110,31 @@ class IndexClient(object):
             else:
                 raise exception
 
+        return [
+            Document(self, doc['did'], json=doc)
+            for doc in response.json()
+        ]
+
+    def bulk_get_latest(self, dids, skip_null=False):
+        """
+        bulk get latest version
+        Args:
+            dids (list): list of dids
+            skip_null (boolean): skip null version
+
+        Returns:
+            list: Document objects
+
+        """
+        headers = {'content-type': 'application/json'}
+        try:
+            response = self._post("bulk/documents/latest", params={"skip_null": skip_null},
+                                  json=dids, headers=headers)
+        except requests.HTTPError as exception:
+            if exception.response.status_code == 404:
+                return None
+            else:
+                raise exception
         return [
             Document(self, doc['did'], json=doc)
             for doc in response.json()

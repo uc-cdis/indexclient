@@ -220,3 +220,21 @@ def test_bulk_request(index_client):
     docs = index_client.bulk_request(dids)
     for doc in docs:
         assert doc.did in dids
+
+
+def test_bulk_get_latest(index_client):
+    dids = []
+    new_dids = set()
+    null_dids = set()
+    for i in range(20):
+        doc = create_random_index(index_client, version="1")
+        rev_doc = create_random_index_version(index_client, did=doc.did, version="2")
+        null_doc = create_random_index_version(index_client, did=doc.did) if i < 5 else rev_doc
+        dids.append(doc.did)
+        new_dids.add(rev_doc.did)
+        null_dids.add(null_doc.did)
+
+    docs_null_excluded = index_client.bulk_get_latest(dids, skip_null=True)
+    docs_null_included = index_client.bulk_get_latest(dids, skip_null=False)
+    assert {doc.did for doc in docs_null_excluded} == new_dids
+    assert {doc.did for doc in docs_null_included} == null_dids
