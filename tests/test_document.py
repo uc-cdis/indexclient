@@ -4,7 +4,7 @@ from indexclient.client import Document, recursive_sort
 
 
 def create_document(
-        did=None, hashes=None, size=None, file_name=None, acl=None, rbac=None,
+        did=None, hashes=None, size=None, file_name=None, acl=None, authz=None,
         urls=None, urls_metadata=None):
 
     return Document(None, did, json={
@@ -13,7 +13,7 @@ def create_document(
         'file_name': file_name or 'file.txt',
         'urls': urls or ['one', 'two', 'three'],
         'acl': acl or ['1', '2', '3'],
-        'rbac': rbac or '/gen3/programs/1/projects/2/3',
+        'authz': authz or '/gen3/programs/1/projects/2/3',
         'urls_metadata': urls_metadata or {
             'one': {'1': 'one'},
             'two': {'2': 'two'},
