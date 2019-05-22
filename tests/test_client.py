@@ -12,7 +12,7 @@ def test_instantiate(index_client):
     urls_metadata={url: {'state': 'doing ok'} for url in urls}
     size = 5
     acl = ['a', 'b']
-    authz = '/gen3/programs/a/projects/b'
+    authz = ['/gen3/programs/a/projects/b']
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
     doc = index_client.create(
         hashes=hashes,
@@ -38,7 +38,7 @@ def test_create_with_metadata(index_client):
     urls_metadata = {'s3://bucket/key': {'k': 'v'}}
     size = 5
     acl = ['a', 'b']
-    authz = '/gen3/programs/a/projects/b'
+    authz = ['/gen3/programs/a/projects/b']
     hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
     metadata = {'test': 'value'}
     doc = index_client.create(
@@ -194,11 +194,11 @@ def test_updating_authz(index_client):
     """
     doc = create_random_index(index_client)
 
-    doc.authz = '/gen3/programs/a'
+    doc.authz = ['/gen3/programs/a']
     doc.patch()
 
     same_doc = index_client.get(doc.did)
-    assert same_doc.authz == '/gen3/programs/a'
+    assert same_doc.authz == ['/gen3/programs/a']
 
 
 def test_bulk_request(index_client):
