@@ -1,8 +1,8 @@
 import pytest
-from cdisutilstest.code.conftest import (
+from cdisutilstest.code.conftest import (  # pylint: disable=unused-import
     indexd_server,
     indexd_client,
-)  # pylint: disable=unused-import
+)
 
 
 @pytest.fixture(scope="function")
