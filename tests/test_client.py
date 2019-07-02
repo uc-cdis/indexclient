@@ -7,13 +7,13 @@ from requests import HTTPError
 
 
 def test_instantiate(index_client):
-    baseid = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-    urls = ['s3://url/bucket/key']
-    urls_metadata={url: {'state': 'doing ok'} for url in urls}
+    baseid = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+    urls = ["s3://url/bucket/key"]
+    urls_metadata = {url: {"state": "doing ok"} for url in urls}
     size = 5
-    acl = ['a', 'b']
-    authz = ['/gen3/programs/a/projects/b']
-    hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
+    acl = ["a", "b"]
+    authz = ["/gen3/programs/a/projects/b"]
+    hashes = {"md5": "ab167e49d25b488939b1ede42752458b"}
     doc = index_client.create(
         hashes=hashes,
         size=size,
@@ -34,13 +34,13 @@ def test_instantiate(index_client):
 
 
 def test_create_with_metadata(index_client):
-    urls = ['s3://bucket/key']
-    urls_metadata = {'s3://bucket/key': {'k': 'v'}}
+    urls = ["s3://bucket/key"]
+    urls_metadata = {"s3://bucket/key": {"k": "v"}}
     size = 5
-    acl = ['a', 'b']
-    authz = ['/gen3/programs/a/projects/b']
-    hashes = {'md5': 'ab167e49d25b488939b1ede42752458b'}
-    metadata = {'test': 'value'}
+    acl = ["a", "b"]
+    authz = ["/gen3/programs/a/projects/b"]
+    hashes = {"md5": "ab167e49d25b488939b1ede42752458b"}
+    metadata = {"test": "value"}
     doc = index_client.create(
         hashes=hashes,
         size=size,
@@ -55,13 +55,12 @@ def test_create_with_metadata(index_client):
 
 
 def test_list_with_params(index_client):
-    hashes = {'md5': 'ab167e49d25b488939b1ede42752458c'}
+    hashes = {"md5": "ab167e49d25b488939b1ede42752458c"}
     doc1 = create_random_index(index_client, hashes=hashes)
     doc2 = create_random_index(index_client, hashes=hashes)
 
     docs_with_hashes = index_client.list_with_params(
-        page_size=1,
-        params={'hashes': hashes}
+        page_size=1, params={"hashes": hashes}
     )
     dids = [doc1.did, doc2.did]
     found = []
@@ -72,13 +71,10 @@ def test_list_with_params(index_client):
 
 
 def test_list_with_params_negate(index_client):
-    doc1 = create_random_index(index_client, version='1'
-                               )
-    create_random_index(index_client, version='2')
+    doc1 = create_random_index(index_client, version="1")
+    create_random_index(index_client, version="2")
 
-    docs = index_client.list_with_params(
-        negate_params={'version': '2'}
-    )
+    docs = index_client.list_with_params(negate_params={"version": "2"})
 
     dids = {record.did for record in docs}
     assert dids == {doc1.did}
@@ -164,13 +160,13 @@ def test_updating_metadata(index_client):
     doc = create_random_index(index_client)
 
     doc.metadata["dummy_field"] = "Dummy Var"
-    doc.urls_metadata[doc.urls[0]] = {'a': 'b'}
+    doc.urls_metadata[doc.urls[0]] = {"a": "b"}
     doc.patch()
 
     same_doc = index_client.get(doc.did)
     assert same_doc.metadata is not None
     assert same_doc.metadata.get("dummy_field", None) == "Dummy Var"
-    assert same_doc.urls_metadata == {doc.urls[0]: {'a': 'b'}}
+    assert same_doc.urls_metadata == {doc.urls[0]: {"a": "b"}}
 
 
 def test_updating_acl(index_client):
@@ -180,11 +176,11 @@ def test_updating_acl(index_client):
     """
     doc = create_random_index(index_client)
 
-    doc.acl = ['a']
+    doc.acl = ["a"]
     doc.patch()
 
     same_doc = index_client.get(doc.did)
-    assert same_doc.acl == ['a']
+    assert same_doc.acl == ["a"]
 
 
 def test_updating_authz(index_client):
@@ -194,18 +190,15 @@ def test_updating_authz(index_client):
     """
     doc = create_random_index(index_client)
 
-    doc.authz = ['/gen3/programs/a']
+    doc.authz = ["/gen3/programs/a"]
     doc.patch()
 
     same_doc = index_client.get(doc.did)
-    assert same_doc.authz == ['/gen3/programs/a']
+    assert same_doc.authz == ["/gen3/programs/a"]
 
 
 def test_bulk_request(index_client):
-    dids = [
-        create_random_index(index_client).did
-        for _ in range(20)
-    ]
+    dids = [create_random_index(index_client).did for _ in range(20)]
 
     docs = index_client.bulk_request(dids)
     for doc in docs:

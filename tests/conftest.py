@@ -1,8 +1,11 @@
 import pytest
-from cdisutilstest.code.conftest import indexd_server, indexd_client  # pylint: disable=unused-import
+from cdisutilstest.code.conftest import (  # pylint: disable=unused-import
+    indexd_server,
+    indexd_client,
+)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def index_client(indexd_client):
     """
     Handles getting all the docs from an

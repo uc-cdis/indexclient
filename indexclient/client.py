@@ -11,8 +11,13 @@ import requests
 MAX_RETRIES = 10
 
 UPDATABLE_ATTRS = [
-    'file_name', 'urls', 'version',
-    'metadata', 'acl', 'authz', 'urls_metadata'
+    "file_name",
+    "urls",
+    "version",
+    "metadata",
+    "acl",
+    "authz",
+    "urls_metadata",
 ]
 
 
@@ -35,6 +40,7 @@ def timeout_wrapper(func):
     def timeout(*args, **kwargs):
         kwargs.setdefault("timeout", 60)
         return func(*args, **kwargs)
+
     return timeout
 
 
@@ -46,7 +52,7 @@ def retry_and_timeout_wrapper(func):
             try:
                 return func(*args, **kwargs)
             except requests.exceptions.ReadTimeout:
-                retries +=1
+                retries += 1
                 if retries == MAX_RETRIES:
                     raise
 
@@ -54,7 +60,6 @@ def retry_and_timeout_wrapper(func):
 
 
 class IndexClient(object):
-
     def __init__(self, baseurl, version="v0", auth=None):
         self.auth = auth
         self.url = baseurl
@@ -65,7 +70,7 @@ class IndexClient(object):
 
     def check_status(self):
         """Check that the API we are trying to communicate with is online"""
-        resp = requests.get(self.url + '/index')
+        resp = requests.get(self.url + "/index")
         handle_error(resp)
 
     def global_get(self, did, no_dist=False):
@@ -83,7 +88,7 @@ class IndexClient(object):
         """
         try:
             if no_dist:
-                response = self._get(did, params={'no_dist': ''})
+                response = self._get(did, params={"no_dist": ""})
             else:
                 response = self._get(did)
         except requests.HTTPError as e:
@@ -125,7 +130,7 @@ class IndexClient(object):
             list: Document objects representing  index records
         """
 
-        headers = {'content-type': 'application/json'}
+        headers = {"content-type": "application/json"}
         try:
             response = self._post("bulk/documents", json=dids, headers=headers)
         except requests.HTTPError as exception:
@@ -134,10 +139,7 @@ class IndexClient(object):
             else:
                 raise exception
 
-        return [
-            Document(self, doc['did'], json=doc)
-            for doc in response.json()
-        ]
+        return [Document(self, doc["did"], json=doc) for doc in response.json()]
 
     def get_with_params(self, params=None):
         """
@@ -148,36 +150,43 @@ class IndexClient(object):
         # index client like signpost or indexd will need to handle the
         # query param `'hash': 'hash_type:hash'`
         params_copy = copy.deepcopy(params) or {}
-        if 'hashes' in params_copy:
-            params_copy['hash'] = params_copy.pop('hashes')
+        if "hashes" in params_copy:
+            params_copy["hash"] = params_copy.pop("hashes")
         reformatted_params = dict()
-        for param in ['hash', 'metadata']:
+        for param in ["hash", "metadata"]:
             if param in params_copy:
                 reformatted_params[param] = []
                 for k, v in params_copy[param].items():
-                    reformatted_params[param].append(str(k) + ':' + str(v))
+                    reformatted_params[param].append(str(k) + ":" + str(v))
                 del params_copy[param]
         reformatted_params.update(params_copy)
-        reformatted_params['limit'] = 1
+        reformatted_params["limit"] = 1
 
         try:
-            response = self._get('index', params=reformatted_params)
+            response = self._get("index", params=reformatted_params)
         except requests.HTTPError as e:
             if e.response.status_code == 404:
                 return None
             else:
                 raise e
-        if not response.json()['records']:
+        if not response.json()["records"]:
             return None
-        json = response.json()['records'][0]
-        did = json['did']
+        json = response.json()["records"][0]
+        did = json["did"]
         return Document(self, did, json=json)
 
     def list(self, limit=float("inf"), start=None, page_size=100):
         """ Returns a generator of document objects. """
         return self.list_with_params(limit, start, page_size)
 
-    def list_with_params(self, limit=float("inf"), start=None, page_size=100, params=None, negate_params=None):
+    def list_with_params(
+        self,
+        limit=float("inf"),
+        start=None,
+        page_size=100,
+        params=None,
+        negate_params=None,
+    ):
         """
         Return a generator of document object corresponding to the supplied parameters, such
         as ``{'hashes': {'md5': '...'},
@@ -187,16 +196,16 @@ class IndexClient(object):
              }``.
         """
         params_copy = copy.deepcopy(params) or {}
-        if 'hashes' in params_copy:
-            params_copy['hash'] = params_copy.pop('hashes')
-        if 'urls_metadata' in params_copy:
-            params_copy['urls_metadata'] = json.dumps(params_copy.pop('urls_metadata'))
+        if "hashes" in params_copy:
+            params_copy["hash"] = params_copy.pop("hashes")
+        if "urls_metadata" in params_copy:
+            params_copy["urls_metadata"] = json.dumps(params_copy.pop("urls_metadata"))
         reformatted_params = dict()
-        for param in ['hash', 'metadata']:
+        for param in ["hash", "metadata"]:
             if param in params_copy:
                 reformatted_params[param] = []
                 for k, v in params_copy[param].items():
-                    reformatted_params[param].append(str(k) + ':' + str(v))
+                    reformatted_params[param].append(str(k) + ":" + str(v))
                 del params_copy[param]
         reformatted_params.update(params_copy)
         reformatted_params.update({"limit": page_size, "start": start})
@@ -215,16 +224,26 @@ class IndexClient(object):
                     yielded += 1
                 else:
                     return
-            if len(json_str['records']) == page_size:
-                reformatted_params['start'] = json_str['records'][-1]['did']
+            if len(json_str["records"]) == page_size:
+                reformatted_params["start"] = json_str["records"][-1]["did"]
             else:
                 # There's no more results
                 return
 
     def create(
-            self, hashes, size, did=None, urls=None, file_name=None,
-            metadata=None, baseid=None, acl=None, urls_metadata=None, version=None,
-            authz=None):
+        self,
+        hashes,
+        size,
+        did=None,
+        urls=None,
+        file_name=None,
+        metadata=None,
+        baseid=None,
+        acl=None,
+        urls_metadata=None,
+        version=None,
+        authz=None,
+    ):
         """Create a new entry in indexd
 
         Args:
@@ -257,28 +276,40 @@ class IndexClient(object):
             "baseid": baseid,
             "acl": acl,
             "authz": authz,
-            "version": version
+            "version": version,
         }
         if did:
             json["did"] = did
         resp = self._post(
-            "index/", headers={"content-type": "application/json"},
-            data=json_dumps(json), auth=self.auth)
+            "index/",
+            headers={"content-type": "application/json"},
+            data=json_dumps(json),
+            auth=self.auth,
+        )
         return Document(self, resp.json()["did"])
 
     def create_alias(
-            self, record, size, hashes, release=None,
-            metastring=None, host_authorities=None, keeper_authority=None):
-        data = json_dumps({
-            'size': size,
-            'hashes': hashes,
-            'release': release,
-            'metastring': metastring,
-            'host_authorities': host_authorities,
-            'keeper_authority': keeper_authority
-        })
-        url = '/alias/' + record
-        headers = {'content-type': 'application/json'}
+        self,
+        record,
+        size,
+        hashes,
+        release=None,
+        metastring=None,
+        host_authorities=None,
+        keeper_authority=None,
+    ):
+        data = json_dumps(
+            {
+                "size": size,
+                "hashes": hashes,
+                "release": release,
+                "metastring": metastring,
+                "host_authorities": host_authorities,
+                "keeper_authority": keeper_authority,
+            }
+        )
+        url = "/alias/" + record
+        headers = {"content-type": "application/json"}
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
         return resp.json()
 
@@ -308,7 +339,9 @@ class IndexClient(object):
             Document: the version that was just added
         """
 
-        rev_doc = self._post("index", current_did, json=new_doc.to_json(), auth=self.auth).json()
+        rev_doc = self._post(
+            "index", current_did, json=new_doc.to_json(), auth=self.auth
+        ).json()
         if rev_doc and "did" in rev_doc:
             return Document(self, rev_doc["did"])
         return None
@@ -352,7 +385,6 @@ class DocumentDeletedError(Exception):
 
 
 class Document(object):
-
     def __init__(self, client, did, json=None):
         self.client = client
         self.did = did
@@ -391,11 +423,10 @@ class Document(object):
         Example:
             <Document(size=1, form=object, file_name=filename.txt, ...)>
         """
-        attributes = ', '.join([
-            '{}={}'.format(attr, self.__dict__[attr])
-            for attr in self._attrs
-        ])
-        return '<Document(' + attributes + ')>'
+        attributes = ", ".join(
+            ["{}={}".format(attr, self.__dict__[attr]) for attr in self._attrs]
+        )
+        return "<Document(" + attributes + ")>"
 
     def _check_deleted(self):
         if self._deleted:
@@ -404,7 +435,9 @@ class Document(object):
     def _render(self, include_rev=True):
         self._check_deleted()
         if not self._fetched:
-            raise RuntimeError("Document must be fetched from the server before being rendered as json")
+            raise RuntimeError(
+                "Document must be fetched from the server before being rendered as json"
+            )
         return self._doc
 
     def to_json(self, include_rev=True):
@@ -418,7 +451,7 @@ class Document(object):
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
         # set attributes to current Document
-        for k,v in json.items():
+        for k, v in json.items():
             self.__dict__[k] = v
         self._attrs = json.keys()
         self._fetched = True
@@ -428,7 +461,7 @@ class Document(object):
         return document with subset of attributes that are allowed
         to be updated
         """
-        return {k:v for k,v in self._doc.items() if k in UPDATABLE_ATTRS}
+        return {k: v for k, v in self._doc.items() if k in UPDATABLE_ATTRS}
 
     @property
     def _doc(self):
@@ -451,18 +484,21 @@ class Document(object):
         """
 
         self._check_deleted()
-        self.client._put("index", self.did,
-                         params={"rev": self.rev},
-                         headers={"content-type": "application/json"},
-                         auth=self.client.auth,
-                         data=json.dumps(self._doc_for_update()))
+        self.client._put(
+            "index",
+            self.did,
+            params={"rev": self.rev},
+            headers={"content-type": "application/json"},
+            auth=self.client.auth,
+            data=json.dumps(self._doc_for_update()),
+        )
         self._load()  # to sync new rev from server
 
     def delete(self):
         self._check_deleted()
-        self.client._delete("index", self.did,
-                            auth=self.client.auth,
-                            params={"rev": self.rev})
+        self.client._delete(
+            "index", self.did, auth=self.client.auth, params={"rev": self.rev}
+        )
         self._deleted = True
 
 
@@ -472,10 +508,7 @@ def recursive_sort(value):
     dictionary's contents being the same instead of comparing their order.
     """
     if isinstance(value, dict):
-        return {
-            key: recursive_sort(value[key])
-            for key in value.keys()
-        }
+        return {key: recursive_sort(value[key]) for key in value.keys()}
     elif isinstance(value, list):
         return sorted([recursive_sort(element) for element in value])
     else:
