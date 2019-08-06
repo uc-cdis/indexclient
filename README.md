@@ -85,76 +85,78 @@ number of languages.
 These queries are handled via requests and wrapped into the index client.
 
 
-  ### Create a record 
+### Create a record 
 
 
-### Method: create
+#### Method: `create`
 
 Example: 
 
 ```python
- indexclient.create(
-    hashes = {'md5': ab167e49d25b488939b1ede42752458b'},
-    size = 5,
-    # optional arguments
-    acl = ["a", "b"]
-  )
+indexclient.create(
+hashes = {'md5': ab167e49d25b488939b1ede42752458b'},
+size = 5,
+# optional arguments
+acl = ["a", "b"]
+)
 ```
-  ### Retrieve a record ###
 
 
-### Method: get
+### Retrieve a record 
+
+
+#### Method: `get`
 
 Example:
 
 ```python
- indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")  
+indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")  
 ```
 
-### Method: global_get
+#### Method: `global_get`
 
 Example:
 
 ```python
- indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
+indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
 ```
- or
+or
 ```python
- indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e", no_dist=True)
+indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e", no_dist=True)
 ```
 
-### Method: get_with_params
+#### Method: `get_with_params`
 
 Example:
 
 ```python
- params = {
-   'hashes': {'md5': ab167e49d25b488939b1ede42752458b'},
-   'size': 5
-   # or any other params (metadata, acl, authz, etc.)
-   }
- indexclient.get_with_params(params)
+params = {
+'hashes': {'md5': ab167e49d25b488939b1ede42752458b'},
+'size': 5
+# or any other params (metadata, acl, authz, etc.)
+}
+indexclient.get_with_params(params)
 ```
 
 
-  ### Retrieve multiple records 
+### Retrieve multiple records 
 
 
-### Method: bulk_request
+#### Method: `bulk_request`
 
 Example:
 
 ```python
- dids = [
-   "03eed607-acb0-4532-b0ee-9e3766b1aa6e",
-   "15684515-15b0-4532-b0ee-9e3766b65515",
-   "03ee4857-acb0-4123-b0ee-9e3766bffa23",
-   "1258d607-acb0-4532-b0ee-9e3766bffa23"
- ]
- indexclient.bulk_request(dids)
+dids = [
+"03eed607-acb0-4532-b0ee-9e3766b1aa6e",
+"15684515-15b0-4532-b0ee-9e3766b65515",
+"03ee4857-acb0-4123-b0ee-9e3766bffa23",
+"1258d607-acb0-4532-b0ee-9e3766bffa23"
+]
+indexclient.bulk_request(dids)
 ```
 
-  ### Update a record 
+### Update a record 
 
 
 First: get a Document object of the desired record with one of the get methods
@@ -169,16 +171,16 @@ Lastly: Update all the local changes that were made to indexd using the
 Example:
 
 ```python
-		doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"')
-		# or any other get method (global_get, etc.)
-		doc.metadata["dummy_field"] = "dummy var"
-		doc.acl = ['a', 'b']
-		doc.version = '2'
-		doc.patch()
+doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"')
+# or any other get method (global_get, etc.)
+doc.metadata["dummy_field"] = "dummy var"
+doc.acl = ['a', 'b']
+doc.version = '2'
+doc.patch()
 ```
 
 
-  ### Delete a record
+### Delete a record
 
 
 First: get a Document object of the desired record with one of the get methods
@@ -188,9 +190,9 @@ Lastly: Check if the record was deleted with: `if doc._deleted`
 Example: 
 
 ```python
-		doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
-		# or any other get method (global_get, etc.)
-		doc.delete()
-		if doc._deleted == False:
-				return "Record is not deleted"
+doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
+# or any other get method (global_get, etc.)
+doc.delete()
+if doc._deleted == False:
+return "Record is not deleted"
 ```

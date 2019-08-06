@@ -18,7 +18,6 @@ UPDATABLE_ATTRS = [
     "acl",
     "authz",
     "urls_metadata",
-    "uploader",
 ]
 
 
@@ -244,7 +243,6 @@ class IndexClient(object):
         urls_metadata=None,
         version=None,
         authz=None,
-        uploader=None,
     ):
         """Create a new entry in indexd
 
@@ -279,7 +277,6 @@ class IndexClient(object):
             "acl": acl,
             "authz": authz,
             "version": version,
-            "uploader": uploader,
         }
         if did:
             json["did"] = did
