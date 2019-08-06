@@ -161,15 +161,7 @@ First: get a Document object of the desired record with one of the get methods
 Second: Update any of the records updatable attributes.
   - the format to do this is: `doc.attr = value`
       - eg: `doc.file_name = new_file_name`
-  - Updatable attributes are: 
-     file_name
-     urls
-     version
-     metadata
-     acl
-     authz
-     urls_metadata
-		 uploader
+  - Updatable attributes are: file_name urls, version, metadata, acl, authz, urls_metadata, uploader
 
 Lastly: Update all the local changes that were made to indexd using the 
         Document patch method: doc.patch()
