@@ -91,14 +91,14 @@ These queries are handled via requests and wrapped into the index client.
 ### Method: create
 
 Example: 
-`
- indexclient.create(
-    hashes = {'md5': ab167e49d25b488939b1ede42752458b'},
-    size = 5,
-    # optional arguments
-    acl = ["a", "b"]
-  )
-`
+
+ `indexclient.create(`
+    `hashes = {'md5': ab167e49d25b488939b1ede42752458b'},`
+    `size = 5,`
+    `# optional arguments`
+    `acl = ["a", "b"]`
+  `)`
+
   ### Retrieve a record ###
 
 
@@ -111,21 +111,21 @@ Example:
 ### Method: global_get
 
 Example:
-`
- indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")  
+
+ `indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")`
  or
- indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e", no_dist=True)
+ `indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e", no_dist=True)`
 `
 ### Method: get_with_params
 
 Example:
-`
- params = {
-   'hashes': {'md5': ab167e49d25b488939b1ede42752458b'}, 
-   'size': 5
-   # or any other params (metadata, acl, authz, etc.)
-   }
- indexclient.get_with_params(params)
+
+ `params = {`
+   `'hashes': {'md5': ab167e49d25b488939b1ede42752458b'},`
+   `'size': 5`
+   `# or any other params (metadata, acl, authz, etc.)`
+   `}`
+ `indexclient.get_with_params(params)`
 `
 
   ### Retrieve multiple records 
@@ -134,14 +134,14 @@ Example:
 ### Method: bulk_request
 
 Example:
-`
- dids = [
-   "03eed607-acb0-4532-b0ee-9e3766b1aa6e",
-   "15684515-15b0-4532-b0ee-9e3766b65515",
-   "03ee4857-acb0-4123-b0ee-9e3766bffa23",
-   "1258d607-acb0-4532-b0ee-9e3766bffa23"
- ]
- indexclient.bulk_request(dids)
+
+ `dids = [`
+   `"03eed607-acb0-4532-b0ee-9e3766b1aa6e",`
+   `"15684515-15b0-4532-b0ee-9e3766b65515",`
+   `"03ee4857-acb0-4123-b0ee-9e3766bffa23",`
+   `"1258d607-acb0-4532-b0ee-9e3766bffa23"`
+ `]`
+ `indexclient.bulk_request(dids)`
 `
 
   ### Update a record 
@@ -151,28 +151,28 @@ First: get a Document object of the desired record with one of the get methods
 Second: Update any of the records updatable attributes.
   - the format to do this is: `doc.attr = value`
       - eg: `doc.file_name = new_file_name`
-  - Updatable attributes are: `UPDATABLE_ATTRS = 
-    [ "file_name",
-      "urls",
-      "version", 
-      "metadata",
-      "acl",
-      "authz",
-      "urls_metadata"
-			"uploader" ]`
+  - Updatable attributes are: 
+     - file_name
+     - urls
+     - version
+     - metadata
+     - acl
+     - authz
+     - urls_metadata
+		 - uploader
 
 Lastly: Update all the local changes that were made to indexd using the 
         Document patch method: `doc.patch()`
 
 Example:
-`
-		doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"')
-		# or any other get method (global_get, etc.)
-		doc.metadata["dummy_field"] = "dummy var"
-		doc.acl = ['a', 'b']
-		doc.version = '2'
-		doc.patch()
-`
+
+		`doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"')`
+		`# or any other get method (global_get, etc.)`
+		`doc.metadata["dummy_field"] = "dummy var"`
+		`doc.acl = ['a', 'b']`
+		`doc.version = '2'`
+		`doc.patch()`
+
 
   ### Delete a record
 
@@ -182,10 +182,10 @@ Second: Delete the record from indexd with the delete method: doc.delete()
 Lastly: Check if the record was deleted with: if doc._deleted
 
 Example: 
-`
-		doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
-		# or any other get method (global_get, etc.)
-		doc.delete()
-		if doc._deleted == False:
-				return "Record is not deleted"
-`
+
+		`doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")`
+		`# or any other get method (global_get, etc.)`
+		`doc.delete()`
+		`if doc._deleted == False:`
+				`return "Record is not deleted"`
+
