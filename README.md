@@ -162,14 +162,14 @@ Second: Update any of the records updatable attributes.
   - the format to do this is: `doc.attr = value`
       - eg: `doc.file_name = new_file_name`
   - Updatable attributes are: 
-     - file_name
-     - urls
-     - version
-     - metadata
-     - acl
-     - authz
-     - urls_metadata
-		 - uploader
+     -file_name
+     -urls
+     -version
+     -metadata
+     -acl
+     -authz
+		 -uploader
+     -urls_metadata
 
 Lastly: Update all the local changes that were made to indexd using the 
         Document patch method: doc.patch()
