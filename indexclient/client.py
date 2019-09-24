@@ -1,8 +1,3 @@
-try:
-    from urlparse import urljoin
-except ImportError:
-    from urllib.parse import urljoin
-
 import copy
 import json
 
@@ -66,7 +61,8 @@ class IndexClient(object):
         self.version = version
 
     def url_for(self, *path):
-        return urljoin(self.url, "/".join(path))
+        subpath = "/".join(path).lstrip("/")
+        return "{}/{}".format(self.url.rstrip("/"), subpath)
 
     def check_status(self):
         """Check that the API we are trying to communicate with is online"""
