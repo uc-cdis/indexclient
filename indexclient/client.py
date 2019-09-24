@@ -308,7 +308,7 @@ class IndexClient(object):
                 "keeper_authority": keeper_authority,
             }
         )
-        url = "/alias/" + record
+        url = "alias/" + record
         headers = {"content-type": "application/json"}
         resp = self._put(url, headers=headers, data=data, auth=self.auth)
         return resp.json()
