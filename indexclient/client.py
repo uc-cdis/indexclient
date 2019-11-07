@@ -1,5 +1,6 @@
 import copy
 import json
+import warnings
 
 import requests
 
@@ -284,6 +285,10 @@ class IndexClient(object):
         )
         return Document(self, resp.json()["did"])
 
+    # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
+    # For creating aliases for indexd records, prefer using
+    # the `add_alias_for_did` function, which interacts with the new
+    # `/index/{GUID}/aliases` endpoint.
     def create_alias(
         self,
         record,
@@ -294,6 +299,14 @@ class IndexClient(object):
         host_authorities=None,
         keeper_authority=None,
     ):
+        warnings.warn(
+            (
+                "This function is deprecated. For creating aliases for indexd "
+                "records, prefer using the `add_alias_for_did` function, which "
+                "interacts with the new `/index/{GUID}/aliases` endpoint."
+            ),
+            DeprecationWarning,
+        )
         data = json_dumps(
             {
                 "size": size,

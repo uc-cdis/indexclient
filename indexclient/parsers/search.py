@@ -2,6 +2,7 @@ import sys
 import json
 import logging
 import argparse
+import warnings
 
 import requests
 
@@ -54,10 +55,22 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
     sys.stdout.write(json.dumps(doc))
 
 
+# DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
+# For creating aliases for indexd records, prefer using
+# the `add_alias` function, which interacts with the new
+# `/index/{GUID}/aliases` endpoint.
 def search_names(host, port, limit, start, size, hashes, **kwargs):
     """
     Finds records matching specified search criteria.
     """
+    warnings.warn(
+        (
+            "This function is deprecated. For creating aliases for indexd "
+            "records, prefer using the `add_alias_for_did` function, which "
+            "interacts with the new `/index/{GUID}/aliases` endpoint."
+        ),
+        DeprecationWarning,
+    )
     if size is not None and size < 0:
         raise ValueError("size must be non-negative")
 

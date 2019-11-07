@@ -1,18 +1,31 @@
 import sys
 import json
 import argparse
+import warnings
 
 import requests
 
 from indexclient import errors
 
 
+# DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
+# For creating aliases for indexd records, prefer using
+# the `add_alias` function, which interacts with the new
+# `/index/{GUID}/aliases` endpoint.
 def name_record(
     host, port, name, rev, size, hashes, release, metadata, hosts, keeper, **kwargs
 ):
     """
     Alias a record.
     """
+    warnings.warn(
+        (
+            "This function is deprecated. For creating aliases for indexd "
+            "records, prefer using the `add_alias_for_did` function, which "
+            "interacts with the new `/index/{GUID}/aliases` endpoint."
+        ),
+        DeprecationWarning,
+    )
     resource = "http://{host}:{port}/alias/{name}".format(
         host=host, port=port, name=name
     )
