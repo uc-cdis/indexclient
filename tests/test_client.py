@@ -212,8 +212,7 @@ def test_add_alias_for_did(index_client):
 
     # Add an alias for the did using indexclient
     alias = "test_alias_123"
-    res = index_client.add_alias_for_did(alias, did)
-    assert res.status_code == 200, res.text
+    index_client.add_alias_for_did(alias, did)
 
     # Confirm that we can retrieve the original document using this alias
     # on the global_get endpoint
