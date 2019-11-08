@@ -4,6 +4,8 @@ import warnings
 
 import requests
 
+from indexclient.errors import BaseIndexError
+
 MAX_RETRIES = 10
 
 UPDATABLE_ATTRS = [
@@ -290,6 +292,15 @@ class IndexClient(object):
         Adds an alias for a document id (did). Once an alias is created for
         a did, the document can be retrieved by the alias using the 
         `global_get(alias)` function.
+
+
+        :param str alias:
+            The alias we want to assign to the document id.
+        :param str did:
+            The document id for the index record we want to alias.
+
+        :raises BaseIndexError:
+            Raised if aliasing operation fails.
         """
         alias_payload = {"aliases": [{"value": alias}]}
         resp = self._post(
@@ -298,7 +309,9 @@ class IndexClient(object):
             data=json.dumps(alias_payload),
             auth=self.auth,
         )
-        return resp
+        if resp.status_code != 200:
+            raise BaseIndexError(resp.status_code, resp.text)
+        return
 
     # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
     # For creating aliases for indexd records, prefer using
