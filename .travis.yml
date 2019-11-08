@@ -7,3 +7,6 @@ install:
 - pip install . --force --upgrade
 - pip install -r test-requirements.txt
 script: python -m pytest -vvvs tests
+jobs:
+  allow_failures:
+  - python: '2.7'
