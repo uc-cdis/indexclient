@@ -203,3 +203,20 @@ def test_bulk_request(index_client):
     docs = index_client.bulk_request(dids)
     for doc in docs:
         assert doc.did in dids
+
+
+def test_add_alias_for_did(index_client):
+
+    # Create a record in indexd and retrieve the did
+    did = create_random_index(index_client).did
+
+    # Add an alias for the did using indexclient
+    alias = "test_alias_123"
+    res = index_client.add_alias_for_did(alias, did)
+    assert res.status_code == 200, res.text
+
+    # Confirm that we can retrieve the original document using this alias
+    # on the global_get endpoint
+    doc = index_client.global_get(alias)
+    assert doc is not None, f"Failed to retrieve document {did} using alias {alias}"
+    assert doc.did == did, f"Retrieved incorrect document {doc.did}, expected {did}"

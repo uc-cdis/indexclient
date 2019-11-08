@@ -285,6 +285,21 @@ class IndexClient(object):
         )
         return Document(self, resp.json()["did"])
 
+    def add_alias_for_did(self, alias, did):
+        """
+        Adds an alias for a document id (did). Once an alias is created for
+        a did, the document can be retrieved by the alias using the 
+        `global_get(alias)` function.
+        """
+        alias_payload = {"aliases": [{"value": alias}]}
+        resp = self._post(
+            "index/{}/aliases/".format(did),
+            headers={"content-type": "application/json"},
+            data=json.dumps(alias_payload),
+            auth=self.auth,
+        )
+        return resp
+
     # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
     # For creating aliases for indexd records, prefer using
     # the `add_alias_for_did` function, which interacts with the new
