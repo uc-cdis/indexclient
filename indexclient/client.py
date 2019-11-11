@@ -372,6 +372,9 @@ class Document(object):
         """
         return self._sorted_doc != other_doc._sorted_doc
 
+    def __hash__(self):
+        return hash(repr(self))
+
     def __lt__(self, other_doc):
         return self.did < other_doc.did
 
