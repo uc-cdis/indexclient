@@ -349,7 +349,7 @@ class Document(object):
 
     def __init__(self, client, did, json=None):
         self.client = client
-        self.did = did
+        self._did = did
         self._fetched = False
         self._deleted = False
         self._load(json)
@@ -357,20 +357,14 @@ class Document(object):
     def __eq__(self, other_doc):
         """
         equals `==` operator overload
-
-        It doesn't matter the order of the urls list. What matters is the
-        existence of the urls are the same on both sides.
         """
-        return self._sorted_doc == other_doc._sorted_doc
+        return self.did == other_doc.did
 
     def __ne__(self, other_doc):
         """
         not equals `!=` operator overload
-
-        It doesn't matter the order of the urls list. What matters is the
-        existence of the urls are the same on both sides.
         """
-        return self._sorted_doc != other_doc._sorted_doc
+        return self.did != other_doc.did
 
     def __hash__(self):
         return hash(self.did)
@@ -426,6 +420,10 @@ class Document(object):
         to be updated
         """
         return {k:v for k,v in self._doc.items() if k in UPDATABLE_ATTRS}
+
+    @property
+    def did(self):
+        return self._did
 
     @property
     def _doc(self):
