@@ -349,7 +349,7 @@ class Document(object):
 
     def __init__(self, client, did, json=None):
         self.client = client
-        self._did = did
+        self.did = did
         self._fetched = False
         self._deleted = False
         self._load(json)
@@ -420,10 +420,6 @@ class Document(object):
         to be updated
         """
         return {k:v for k,v in self._doc.items() if k in UPDATABLE_ATTRS}
-
-    @property
-    def did(self):
-        return self._did
 
     @property
     def _doc(self):
