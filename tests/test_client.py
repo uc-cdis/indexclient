@@ -217,5 +217,10 @@ def test_add_alias_for_did(index_client):
     # Confirm that we can retrieve the original document using this alias
     # on the global_get endpoint
     doc = index_client.global_get(alias)
-    assert doc is not None, "Failed to retrieve document {} using alias {}".format(did, alias)
-    assert doc.did == did, "Retrieved incorrect document {}, expected {}".format(did, alias)
+    assert doc is not None, "Failed to retrieve document {} using alias {}".format(
+        did, alias
+    )
+    assert doc.did == did, "Retrieved incorrect document {}, expected {}".format(
+        did, alias
+    )
+

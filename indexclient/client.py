@@ -312,7 +312,9 @@ class IndexClient(object):
         try:
             return resp.json()
         except ValueError as err:
-            reason = json.dumps({"error": "invalid json payload returned: {}".format(err)})
+            reason = json.dumps(
+                {"error": "invalid json payload returned: {}".format(err)}
+            )
             raise BaseIndexError(resp.status_code, reason)
 
     # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
