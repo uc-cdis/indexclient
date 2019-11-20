@@ -223,4 +223,3 @@ def test_add_alias_for_did(index_client):
     assert doc.did == did, "Retrieved incorrect document {}, expected {}".format(
         did, alias
     )
-
