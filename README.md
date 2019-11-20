@@ -211,11 +211,10 @@ You can use `indexclient` to create aliases for documents in `indexd`, which ena
 Example:
 
 ```python
-try:
-    indexclient.add_alias_for_did("10.1000/182", "g.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
-except BaseIndexError as err:
-    # Alias creation failed -- handle error
-    
+res = indexclient.add_alias_for_did("10.1000/182", "g.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
+if res.status_code != 200:
+    # alias creation failed -- handle error
+
 doc = indexclient.global_get("10.1000/182")
 print(doc.did) # >> "g.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"
 ```
