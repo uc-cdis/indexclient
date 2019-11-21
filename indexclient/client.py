@@ -1,7 +1,10 @@
 import copy
 import json
+import warnings
 
 import requests
+
+from indexclient.errors import BaseIndexError
 
 MAX_RETRIES = 10
 
@@ -284,6 +287,40 @@ class IndexClient(object):
         )
         return Document(self, resp.json()["did"])
 
+    def add_alias_for_did(self, alias, did):
+        """
+        Adds an alias for a document id (did). Once an alias is created for
+        a did, the document can be retrieved by the alias using the 
+        `global_get(alias)` function.
+
+
+        :param str alias:
+            The alias we want to assign to the document id.
+        :param str did:
+            The document id for the index record we want to alias.
+
+        :raises BaseIndexError:
+            Raised if aliasing operation fails.
+        """
+        alias_payload = {"aliases": [{"value": alias}]}
+        resp = self._post(
+            "index/{}/aliases/".format(did),
+            headers={"content-type": "application/json"},
+            data=json.dumps(alias_payload),
+            auth=self.auth,
+        )
+        try:
+            return resp.json()
+        except ValueError as err:
+            reason = json.dumps(
+                {"error": "invalid json payload returned: {}".format(err)}
+            )
+            raise BaseIndexError(resp.status_code, reason)
+
+    # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
+    # For creating aliases for indexd records, prefer using
+    # the `add_alias_for_did` function, which interacts with the new
+    # `/index/{GUID}/aliases` endpoint.
     def create_alias(
         self,
         record,
@@ -294,6 +331,14 @@ class IndexClient(object):
         host_authorities=None,
         keeper_authority=None,
     ):
+        warnings.warn(
+            (
+                "This function is deprecated. For creating aliases for indexd "
+                "records, prefer using the `add_alias_for_did` function, which "
+                "interacts with the new `/index/{GUID}/aliases` endpoint."
+            ),
+            DeprecationWarning,
+        )
         data = json_dumps(
             {
                 "size": size,

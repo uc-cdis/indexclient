@@ -110,7 +110,7 @@ acl = ["a", "b"]
 Example:
 
 ```python
-indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")  
+indexclient.get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")  
 ```
 
 #### Method: `global_get`
@@ -118,11 +118,18 @@ indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
 Example:
 
 ```python
-indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
+indexclient.global_get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
 ```
 or
 ```python
-indexclient.global_get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e", no_dist=True)
+indexclient.global_get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e", no_dist=True)
+```
+
+`global_get` can also be used to retrieve records by alias. See [Add an alias for a record](#add-an-alias-for-a-record).
+```python
+# Retrieve a document by its alias, "10.1000/182"
+doc = indexclient.global_get("10.1000/182")
+print(doc.did) # >> "g.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"
 ```
 
 #### Method: `get_with_params`
@@ -171,7 +178,7 @@ Lastly: Update all the local changes that were made to indexd using the
 Example:
 
 ```python
-doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"')
+doc = indexclient.get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"')
 # or any other get method (global_get, etc.)
 doc.metadata["dummy_field"] = "dummy var"
 doc.acl = ['a', 'b']
@@ -190,9 +197,24 @@ Lastly: Check if the record was deleted with: `if doc._deleted`
 Example: 
 
 ```python
-doc = indexclient.get(did="dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
+doc = indexclient.get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
 # or any other get method (global_get, etc.)
 doc.delete()
 if doc._deleted == False:
 return "Record is not deleted"
+```
+
+### Add an alias for a record
+
+You can use `indexclient` to create aliases for documents in `indexd`, which enable you to retrieve documents by the alias instead of by the Document identifier (`did` / `GUID`). Aliases can be created using `indexclient.add_alias_for_did(alias=alias, did=did)` and can be retrieved using `indexclient.global_get(alias)`.
+
+Example:
+
+```python
+res = indexclient.add_alias_for_did("10.1000/182", "g.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
+if res.status_code != 200:
+    # alias creation failed -- handle error
+
+doc = indexclient.global_get("10.1000/182")
+print(doc.did) # >> "g.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e"
 ```
