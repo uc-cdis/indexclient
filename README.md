@@ -1,8 +1,8 @@
-Index
+Indexclient
 ===
-![version](https://img.shields.io/badge/version-0.0.1-orange.svg?style=flat) [![Apache license](http://img.shields.io/badge/license-Apache-blue.svg?style=flat)](LICENSE) [![Travis](https://travis-ci.org/LabAdvComp/index.svg?branch=master)](https://travis-ci.org/LabAdvComp/index)
+![version](https://img.shields.io/badge/version-2.0.0-green.svg?style=flat) [![Apache license](http://img.shields.io/badge/license-Apache-blue.svg?style=flat)](LICENSE) [![Travis](https://travis-ci.org/uc-cdis/indexclient.svg?branch=master)](https://travis-ci.org/uc-cdis/indexclient)
 
-Index is a prototype data indexing and tracking client. It is intended to
+Indexclient is a prototype data indexing and tracking client. It is intended to
 provide a simple means of interactively investigating
 [indexd](https://github.com/LabAdvComp/indexd) deployments. It is built upon
 a basic REST-like API and demonstrates how a client utility can be built to
