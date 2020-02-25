@@ -22,7 +22,7 @@ deploy:
   skip_cleanup: true
   on:
     python: 3.6
-    repo: uc-cdis/REPO_NAME
+    repo: uc-cdis/indexclient
     tags: true
   password:
     secure: RS3H3mkw2FNMhhFd+j+jTzWchVgyVJO3zQZQRTe1k5jz8TLe03wus/U5i4yOyWhZkLkri7WCr0xhdDoAWoJiYCg6LMGTJWtfL4lSv7MNiynvJT3G1yWwD984Zv4idrqjdFEqEsszQY1woHSre8mj4XRbZLy8mI1NGl/pGej9SNkltt22y2NJr9R0lLh+01m9Ed5muuMClebd150Tx5oWuGbEYDkVwJVO/MjyUrhDMYzB1O51u+jQni+PQg9NCZ4HV+GDe4d8Er8MLfAxMYsPLMTcTxeqIODjLIu8grplTde/0zpJw+ZEHuiwC6E6QIJxHFW04ts69bcQ4k2E1u6SAYORkEZcC3VvEUP8vR1k3obhMfF+OYF55io4pzZSLXwedt5LKOAKQaj3qSEB/PPWcYSwyxCEy2tk4zTT7YU05epKGqioOCd4m21nWaHOLQ0j4nVK6Ko2uR4lGnpQPpErvzgJJfLCFiJ3c8YPX7lWBucePraO00S4wRpCRMgAJ9R5xrHT9g0epAF2tEPrLuGZkTRDOXC/XS0Fztrt2bcoc6XB+uFznemqSBVAuM5xQonxMHUPDVUU8q8B6L3pvkAYMzlBYFY8e49UtauqJxkmHTv8TzLqoGrYh1vQJMA/vUxsOpdQh+EWT5s61x26QfFEXeKxP7LtJ2xgNgrfxJQJjE4=
