@@ -2,7 +2,30 @@ language: python
 python:
 - '3.6'
 sudo: false
+env:
+  global:
+  - PIPENV_IGNORE_VIRTUALENVS=1
+  - secure: mLm9xvmW1+w0StFnkgCxE/OE9Ov6MCzb0eU8dZyANZCNKAMBCNIq2hKnySoaH9TN9vU8CGVxdCBSSC8B6BQ/kgTnpU/ZPevMKs1lPuvKSp1XJFW5dfx5YlKuBTNz/JegWhD9kOX3fbMm87e0wfMTCMpzjOZRPZSx15zIfMir1g9xTGB+dKazkGoQmiDrSpu4W0/UOGp0Ni3ISwAGt8lQ2wtZCQ6+vsPvdBnnSXWIS60MHzYIxxWbIPCDw21EcLJJH6IZyMpdWVfcYz3/Tsd4vtJGS9d3WXRpJqCrMUzdh1py/rzhiyh6LoqYsYIfge9sI/MYZ5TcCwS+jE42iL4k2WIVwWOANnc/kDo8RntEfx8+IxxbUHikogab0iaqj64xGhXbi5OzWnVTZZP2G17jcBL/Dxfa/OPltyLMuJRzrL/woaMJAQPv7sDqsuuaPJA1J8Ez+ZVqCVHVECrNyH+vgR2hi7w7Hp68Z9bDRTYvcBZ87WC/AaDIaHlAhUQt5CffBeIhAhHuh9WlHUcnrg7PbCruJ9yRJfy/glDJagEsvTHw7lVhlKNJPbioyH6iV5EYhAynNI/42ihh54PhOZ7jQLidfmBdiGIc6K5wgd8j/anReUqzy1HBNvK9J5itVnhbopY0ukjNkXKJ/aH7SDZAJnUpyPxsw8AIueIzzvpzMI0=
 install:
-- pip install . --force --upgrade
-- pip install -r test-requirements.txt
-script: python -m pytest -vvvs tests
+- pip install pipenv
+- pipenv install --dev --deploy --python `which python`
+- pipenv graph
+script: pipenv run py.test -vv
+before_deploy:
+- sed -i.bak "s/=get_version()/='$TRAVIS_TAG'/g" setup.py
+- cat setup.py
+- if [ $(python setup.py --version) == '0.0.0' ]; then travis_terminate 1; fi
+deploy:
+  provider: pypi
+  user: uc-ctds
+  skip_existing: true
+  skip_cleanup: true
+  on:
+    python: 3.6
+    repo: uc-cdis/indexclient
+    tags: true
+  password:
+    secure: RS3H3mkw2FNMhhFd+j+jTzWchVgyVJO3zQZQRTe1k5jz8TLe03wus/U5i4yOyWhZkLkri7WCr0xhdDoAWoJiYCg6LMGTJWtfL4lSv7MNiynvJT3G1yWwD984Zv4idrqjdFEqEsszQY1woHSre8mj4XRbZLy8mI1NGl/pGej9SNkltt22y2NJr9R0lLh+01m9Ed5muuMClebd150Tx5oWuGbEYDkVwJVO/MjyUrhDMYzB1O51u+jQni+PQg9NCZ4HV+GDe4d8Er8MLfAxMYsPLMTcTxeqIODjLIu8grplTde/0zpJw+ZEHuiwC6E6QIJxHFW04ts69bcQ4k2E1u6SAYORkEZcC3VvEUP8vR1k3obhMfF+OYF55io4pzZSLXwedt5LKOAKQaj3qSEB/PPWcYSwyxCEy2tk4zTT7YU05epKGqioOCd4m21nWaHOLQ0j4nVK6Ko2uR4lGnpQPpErvzgJJfLCFiJ3c8YPX7lWBucePraO00S4wRpCRMgAJ9R5xrHT9g0epAF2tEPrLuGZkTRDOXC/XS0Fztrt2bcoc6XB+uFznemqSBVAuM5xQonxMHUPDVUU8q8B6L3pvkAYMzlBYFY8e49UtauqJxkmHTv8TzLqoGrYh1vQJMA/vUxsOpdQh+EWT5s61x26QfFEXeKxP7LtJ2xgNgrfxJQJjE4=
+after_deploy:
+- pipenv run pip install gen3git
+- pipenv run gen3git release
