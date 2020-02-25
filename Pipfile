@@ -15,6 +15,7 @@ cdislogging = {editable = true,git = "https://github.com/uc-cdis/cdislogging.git
 
 [packages]
 requests = "*"
+indexclient = {editable = true,path = "."}
 
 [requires]
 python_version = "3.6"
