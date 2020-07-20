@@ -5,6 +5,7 @@ from indexd_test_utils import (
     create_indexd_tables,
     index_driver,
     indexd_client,
+    indexd_admin_user,
     indexd_server,
     setup_indexd_test_database,
 )
