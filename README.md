@@ -85,12 +85,12 @@ number of languages.
 These queries are handled via requests and wrapped into the index client.
 
 
-### Create a record 
+### Create a record
 
 
 #### Method: `create`
 
-Example: 
+Example:
 
 ```python
 indexclient.create(
@@ -102,7 +102,7 @@ acl = ["a", "b"]
 ```
 
 
-### Retrieve a record 
+### Retrieve a record
 
 
 #### Method: `get`
@@ -110,7 +110,7 @@ acl = ["a", "b"]
 Example:
 
 ```python
-indexclient.get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")  
+indexclient.get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
 ```
 
 #### Method: `global_get`
@@ -146,7 +146,7 @@ indexclient.get_with_params(params)
 ```
 
 
-### Retrieve multiple records 
+### Retrieve multiple records
 
 
 #### Method: `bulk_request`
@@ -163,7 +163,7 @@ dids = [
 indexclient.bulk_request(dids)
 ```
 
-### Update a record 
+### Update a record
 
 
 First: get a Document object of the desired record with one of the get methods
@@ -172,7 +172,7 @@ Second: Update any of the records updatable attributes.
       - eg: `doc.file_name = new_file_name`
   - Updatable attributes are: file_name urls, version, metadata, acl, authz, urls_metadata, uploader
 
-Lastly: Update all the local changes that were made to indexd using the 
+Lastly: Update all the local changes that were made to indexd using the
         Document patch method: doc.patch()
 
 Example:
@@ -194,7 +194,7 @@ First: get a Document object of the desired record with one of the get methods
 Second: Delete the record from indexd with the delete method: `doc.delete()`
 Lastly: Check if the record was deleted with: `if doc._deleted`
 
-Example: 
+Example:
 
 ```python
 doc = indexclient.get("dg.1234/03eed607-acb0-4532-b0ee-9e3766b1aa6e")
