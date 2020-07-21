@@ -6,3 +6,5 @@ sqlalchemy-utils==0.36.5
 -e git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
 -e git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient
 -e git+https://github.com/uc-cdis/cdislogging.git@0.0.2#egg=cdislogging
+pre-commit==1.21.0
+cfgv==2.0.1

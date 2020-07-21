@@ -1,6 +1,7 @@
 Index
 ===
 ![version](https://img.shields.io/badge/version-0.0.1-orange.svg?style=flat) [![Apache license](http://img.shields.io/badge/license-Apache-blue.svg?style=flat)](LICENSE) [![Travis](https://travis-ci.org/LabAdvComp/index.svg?branch=master)](https://travis-ci.org/LabAdvComp/index)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 Index is a prototype data indexing and tracking client. It is intended to
 provide a simple means of interactively investigating
@@ -8,6 +9,22 @@ provide a simple means of interactively investigating
 a basic REST-like API and demonstrates how a client utility can be built to
 interact with the index in a meaningful manner.
 
+<!--ts-->
+   * [Index](#index)
+      * [Installation](#installation)
+      * [Configuration](#configuration)
+      * [Index Records](#index-records)
+      * [Making Queries](#making-queries)
+         * [Create a record](#create-a-record)
+         * [Name a record](#name-a-record)
+         * [Retrieve a record](#retrieve-a-record)
+         * [Update a record](#update-a-record)
+         * [Delete a record](#delete-a-record)
+      * [Setup pre-commit hook to check for secrets](#setup-pre-commit-hook-to-check-for-secrets)
+
+<!-- Added by: qiaoqiao, at: Tue Jul 21 11:52:15 CDT 2020 -->
+
+<!--te-->
 ## Installation
 
 The prototype implementation for the client is requests based. This
@@ -101,3 +118,27 @@ These queries are handled via requests and wrapped into the index client.
 ### Delete a record
 
 ***TODO***
+
+    
+## Setup pre-commit hook to check for secrets
+
+We use [pre-commit](https://pre-commit.com/) to setup pre-commit hooks for this repo.
+We use [detect-secrets](https://github.com/Yelp/detect-secrets) to search for secrets being committed into the repo. 
+
+To install the pre-commit hook, run
+```
+pre-commit install
+```
+
+To update the .secrets.baseline file run
+```
+detect-secrets scan --update .secrets.baseline
+```
+
+`.secrets.baseline` contains all the string that were caught by detect-secrets but are not stored in plain text. Audit the baseline to view the secrets . 
+
+```
+detect-secrets audit .secrets.baseline
+```
+
+
