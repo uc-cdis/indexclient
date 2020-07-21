@@ -9,6 +9,22 @@ provide a simple means of interactively investigating
 a basic REST-like API and demonstrates how a client utility can be built to
 interact with the index in a meaningful manner.
 
+<!--ts-->
+   * [Index](#index)
+      * [Installation](#installation)
+      * [Configuration](#configuration)
+      * [Index Records](#index-records)
+      * [Making Queries](#making-queries)
+         * [Create a record](#create-a-record)
+         * [Name a record](#name-a-record)
+         * [Retrieve a record](#retrieve-a-record)
+         * [Update a record](#update-a-record)
+         * [Delete a record](#delete-a-record)
+      * [Setup pre-commit hook to check for secrets](#setup-pre-commit-hook-to-check-for-secrets)
+
+<!-- Added by: qiaoqiao, at: Tue Jul 21 11:52:15 CDT 2020 -->
+
+<!--te-->
 ## Installation
 
 The prototype implementation for the client is requests based. This
