@@ -2,11 +2,14 @@ language: python
 
 python:
   - "2.7"
-  - "3.4"
+  - "3.5"
 
 sudo: false
 
-install:
-    - "pip install . --force --upgrade"
+addons:
+  postgresql: '9.4'
 
-script: "py.test -vv tests"
+install:
+    - "pip install tox-travis"
+
+script: "tox"

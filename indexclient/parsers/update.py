@@ -4,18 +4,22 @@ import argparse
 
 import requests
 
-from index.errors import BaseIndexError
+from indexclient.errors import BaseIndexError
 
 
-
-def create_record(host, port, form, size, urls, hashes, **kwargs):
+def update_record(host, port, did, rev, size, hashes, urls, **kwargs):
     '''
-    Create a new record.
+    Update a record.
     '''
-    resource = 'http://{host}:{port}/index/'.format(
+    resource = 'http://{host}:{port}/index/{did}'.format(
         host=host,
         port=port,
+        did=did,
     )
+
+    params = {
+        'rev': rev,
+    }
 
     if size < 0:
         raise ValueError('size must be non-negative')
@@ -37,13 +41,12 @@ def create_record(host, port, form, size, urls, hashes, **kwargs):
         raise ValueError('conflicting hashes provided')
 
     data = {
-        'form': form,
         'size': size,
         'urls': [u for u in urls_set],
         'hashes': hash_dict,
     }
 
-    res = requests.post(resource, json=data)
+    res = requests.put(resource, params=params, json=data)
 
     try: res.raise_for_status()
     except Exception as err:
@@ -59,13 +62,16 @@ def create_record(host, port, form, size, urls, hashes, **kwargs):
 
 def config(parser):
     '''
-    Configure the create command.
+    Configure the update command.
     '''
-    parser.set_defaults(func=create_record)
+    parser.set_defaults(func=update_record)
 
-    parser.add_argument('form',
-        choices=['object', 'container', 'multipart'],
-        help='record format',
+    parser.add_argument('did',
+        help='document id',
+    )
+
+    parser.add_argument('rev',
+        help='document revision',
     )
 
     parser.add_argument('--size',
@@ -80,7 +86,6 @@ def config(parser):
         metavar=('TYPE', 'VALUE'),
         action='append',
         dest='hashes',
-        default=[],
         help='hash type and value',
     )
 

@@ -63,3 +63,6 @@ docs/_build/
 
 local_settings.py
 settings.yaml
+
+# sqlite
+*.sq3

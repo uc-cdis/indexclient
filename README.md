@@ -1,6 +1,7 @@
 Index
 ===
 ![version](https://img.shields.io/badge/version-0.0.1-orange.svg?style=flat) [![Apache license](http://img.shields.io/badge/license-Apache-blue.svg?style=flat)](LICENSE) [![Travis](https://travis-ci.org/LabAdvComp/index.svg?branch=master)](https://travis-ci.org/LabAdvComp/index)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 Index is a prototype data indexing and tracking client. It is intended to
 provide a simple means of interactively investigating
@@ -8,6 +9,22 @@ provide a simple means of interactively investigating
 a basic REST-like API and demonstrates how a client utility can be built to
 interact with the index in a meaningful manner.
 
+<!--ts-->
+   * [Index](#index)
+      * [Installation](#installation)
+      * [Configuration](#configuration)
+      * [Index Records](#index-records)
+      * [Making Queries](#making-queries)
+         * [Create a record](#create-a-record)
+         * [Name a record](#name-a-record)
+         * [Retrieve a record](#retrieve-a-record)
+         * [Update a record](#update-a-record)
+         * [Delete a record](#delete-a-record)
+      * [Setup pre-commit hook to check for secrets](#setup-pre-commit-hook-to-check-for-secrets)
+
+<!-- Added by: qiaoqiao, at: Tue Jul 21 11:52:15 CDT 2020 -->
+
+<!--te-->
 ## Installation
 
 The prototype implementation for the client is requests based. This
@@ -52,27 +69,8 @@ sources in a secure manner.
 Additional metadata that is store in index records include the size of the
 data as well as the type.
 
-Records adhere to the following json-schema:
+Records adhere to the json-schema described in [indexd](https://github.com/LabAdvComp/indexd/blob/master/indexd/index/schema.py#L1):
 
-```json
-{
-    "properties": {
-        "id": {
-            "type": "string",
-            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-        },
-        "rev": {"type": "string"},
-        "size": {"type": "integer"},
-        "hash": {
-            "type": "object",
-            "additionalProperties": true,
-        },
-        "type": { "enum": ["object", "collection", "multipart"] }
-    },
-    "required": ["size","hash"],
-    "additionalProperties": false
-}
-```
 
 An example of one such record:
 
@@ -86,7 +84,10 @@ An example of one such record:
         "sha1": "cb4e5ba5d30fd4667beba95bf73ea9d76ad3dcd4",
         "sha256": "20b599fa98f5f98e89e128ba6de3b65ff753c662721f368649fb8d7e7d4933b0"
     },
-    "type": "object"
+    "type": "object",
+    "urls": [
+      "s3://endpointurl/bucket/key"
+    ]
 }
 ```
 
@@ -117,3 +118,27 @@ These queries are handled via requests and wrapped into the index client.
 ### Delete a record
 
 ***TODO***
+
+    
+## Setup pre-commit hook to check for secrets
+
+We use [pre-commit](https://pre-commit.com/) to setup pre-commit hooks for this repo.
+We use [detect-secrets](https://github.com/Yelp/detect-secrets) to search for secrets being committed into the repo. 
+
+To install the pre-commit hook, run
+```
+pre-commit install
+```
+
+To update the .secrets.baseline file run
+```
+detect-secrets scan --update .secrets.baseline
+```
+
+`.secrets.baseline` contains all the string that were caught by detect-secrets but are not stored in plain text. Audit the baseline to view the secrets . 
+
+```
+detect-secrets audit .secrets.baseline
+```
+
+

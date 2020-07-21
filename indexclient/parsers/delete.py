@@ -5,7 +5,7 @@ import argparse
 
 import requests
 
-from index.errors import BaseIndexError
+from indexclient.errors import BaseIndexError
 
 
 def delete_record(host, port, did, rev, **kwargs):
