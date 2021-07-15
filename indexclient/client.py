@@ -320,6 +320,76 @@ class IndexClient(object):
             versions.append(Document(self, version["did"], version))
         return versions
 
+    def query_urls_metadata(self, url, key, value, fields=None, versioned=False, limit=100, offset=0, page_size=100):
+        """ Queries indexd entries using URL patterns, which can be either full or partial URLs
+        Args:
+            url (str): A URL pattern to match
+            key (str): metadata key
+            value (str): metadata value for key
+            versioned (str): whether or not is versioned
+            fields: (str): comma separated list of fields to return
+            limit: (int): max results to return
+            offset: (int) where to start the next query from
+            page_size (int): how many to query at a time
+        Returns:
+            Generator[Dict]: indexd entries
+        """
+        params = {
+            "url": url,
+            "key": key,
+            "value": value,
+            "fields": fields,
+            "versioned": versioned,
+            "limit": limit if limit < page_size else page_size,
+            "offset": offset
+        }
+
+        while limit > 0:
+            response = self._get("_query/urls/metadata/q", params=params).json()
+            if not response:
+                break
+            for entry in response:
+                yield entry
+
+            limit -= len(response)
+            params["limit"] = min(limit, page_size)
+            params["offset"] += len(response)
+
+
+    def query_url(self, exclude=None, include=None, versioned=False, fields=None, limit=100, offset=0, page_size=100):
+        """ Queries indexd entries using URL patterns, which can be either full or partial URLs
+        Args:
+            exclude (str): A URL pattern to exclude. All URLs matching this pattern will not be included in the return
+            include (str): All entries with URL matching this pattern will be included
+            versioned (str): whether or not is versioned
+            fields: (str): comma separated list of fields to return
+            limit: (int): max results to return
+            offset: (int) where to start the next query from
+            page_size (int): how many to query at a time
+        Returns:
+            Generator[Dict]: indexd entries
+        """
+        params = {
+            "exclude": exclude,
+            "include": include,
+            "versioned": versioned,
+            "fields": fields,
+            "limit": limit if limit < page_size else page_size,
+            "offset": offset
+        }
+        while limit > 0:
+
+            response = self._get("_query/urls/q", params=params).json()
+
+            if not response:
+                break
+            for entry in response:
+                yield entry
+
+            limit -= len(response)
+            params["limit"] = min(limit, page_size)
+            params["offset"] += len(response)
+
     def _get(self, *path, **kwargs):
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)

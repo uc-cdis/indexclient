@@ -1,4 +1,5 @@
 import pytest
+import pkg_resources
 from indexd_test_utils import (
     create_random_index,
     create_random_index_version,
@@ -238,3 +239,54 @@ def test_bulk_get_latest(index_client):
     docs_null_included = index_client.bulk_get_latest(dids, skip_null=False)
     assert {doc.did for doc in docs_null_excluded} == new_dids
     assert {doc.did for doc in docs_null_included} == null_dids
+
+
+@pytest.mark.parametrize("exclude, expectation", [
+    ("01.txt", 4),
+    ("test_bucket", 0),
+])
+def test_query_urls__exclude(indexd_loader, indexd_client, exclude, expectation):
+    test_file = pkg_resources.resource_filename("tests", "data/documents.json")
+    indexd_loader(test_file)
+
+    urls = indexd_client.query_url(exclude=exclude, page_size=2)
+    total_urls = 0
+    for entry in urls:
+        for url in entry["urls"]:
+            assert exclude not in url
+        total_urls += 1
+
+    assert expectation == total_urls
+
+
+@pytest.mark.parametrize("include, expectation", [
+    ("01.txt", 1),
+    ("test_bucket", 5),
+])
+def test_query_urls__include(indexd_loader, indexd_client, include, expectation):
+    test_file = pkg_resources.resource_filename("tests", "data/documents.json")
+    indexd_loader(test_file)
+
+    urls = indexd_client.query_url(include=include, page_size=2)
+    total_urls = 0
+    for entry in urls:
+        assert any([include in url for url in entry["urls"]])
+        total_urls += 1
+    assert expectation == total_urls
+
+
+@pytest.mark.parametrize("params, expected", [
+    ({"url":"s3://localhost:7000/test_bucket_2", "key":"type", "value":"aws", "page_size":2}, 4),
+    ({"url":"s3://localhost:7000/test_bucket", "key":"type", "value":"cleversafe", "page_size":3}, 5),
+    ({"url":"", "key":"state", "value":"invalidated", "page_size":2}, 0),
+    ({"url":"s3://localhost:7000/test_bucket/03.txt", "key":"state", "value":"validated", "page_size":3}, 1),
+    ({"url":"s3://localhost:7000/test_bucket", "key":"type", "value":"cleversafe", "page_size":3, "limit":4}, 4),
+    ({"url":"s3://localhost:7000/test_bucket", "key":"type", "value":"cleversafe", "page_size":3, "limit":0}, 0)
+])
+def test_query_urls_metadata(indexd_loader, indexd_client, params, expected):
+    test_file = pkg_resources.resource_filename("tests", "data/documents.json")
+    indexd_loader(test_file)
+
+    urls = indexd_client.query_urls_metadata(**params)
+
+    assert expected == len(list(urls))

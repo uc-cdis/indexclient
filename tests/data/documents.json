@@ -1,0 +1,75 @@
+{
+    "docs": [
+       {
+          "did": "317f2c0d-bb9f-4924-bedc-d09275a85da4",
+          "size": 122,
+          "file_name": "01.txt",
+          "urls_metadata": {
+             "s3://localhost:7000/test_bucket/01.txt": {
+                "type": "cleversafe",
+                "state": "validated"
+             },
+             "s3://localhost:7000/test_bucket_2/01.txt": {
+                "type": "aws",
+                "state": "validated"
+             }
+          }
+       },
+       {
+          "did": "7316c2ec-ff33-4f79-ab93-c88b253a0f5c",
+          "size": 202,
+          "file_name": "02.txt",
+          "urls_metadata": {
+             "s3://localhost:7000/test_bucket/02.txt": {
+                "type": "cleversafe",
+                "state": "validated"
+             },
+             "s3://localhost:7000/test_bucket_2/02.txt": {
+                "state": "validated",
+                "type": "aws"
+             }
+          }
+       },
+       {
+          "did": "e00b9208-0a97-49e8-ac1d-ed6b1de8ccfd",
+          "size": 322,
+          "file_name": "03.txt",
+          "urls_metadata": {
+             "s3://localhost:7000/test_bucket/03.txt": {
+                "type": "cleversafe",
+                "state": "validated"
+             },
+             "s3://localhost:7000/test_bucket_2/03.txt": {
+                "type": "aws",
+                "state": "validated"
+             }
+          }
+       },
+       {
+          "did": "b4a98c0f-8041-4d47-b296-326ff93eba1e",
+          "size": 402,
+          "file_name": "04.txt",
+          "urls_metadata": {
+             "s3://localhost:7000/test_bucket/04.txt": {
+                "type": "cleversafe",
+                "state": "validated"
+             },
+             "s3://localhost:7000/test_bucket_2/04.txt": {
+                "state": "validated",
+                "type": "aws"
+             }
+          }
+       },
+       {
+          "did": "a4bb37fc-4ad8-4f01-9e30-b6b99b2a7fe4",
+          "size": 412,
+          "file_name": "05.txt",
+          "urls_metadata": {
+             "s3://localhost:7000/test_bucket/05.txt": {
+                "type": "cleversafe",
+                "state": "validated"
+             }
+          }
+       }
+    ]
+ }

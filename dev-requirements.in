@@ -2,15 +2,15 @@
 
 pytest~=4.6.11
 mock~=3.0.5
-sqlalchemy-utils~=0.36.5
+sqlalchemy-utils>=0.32,<0.36.4
 pre-commit~=1.21.0
 
 # python2 requirements
 cfgv~=2.0.1
 more-itertools<6
 
--e git+https://github.com/uc-cdis/cdis-python-utils.git@1.0.0#egg=cdispyutils
--e git+https://github.com/NCI-GDC/indexd.git@2.3.1#egg=indexd
--e git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
--e git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient
+git+https://github.com/uc-cdis/cdis-python-utils.git@1.0.0#egg=cdispyutils
+git+https://github.com/NCI-GDC/indexd.git@2.8.0#egg=indexd
+git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
+git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient
 cdislogging==1.0.0
