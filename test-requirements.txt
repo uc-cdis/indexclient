@@ -1,0 +1,8 @@
+pytest==4.6.11
+mock==3.0.5
+sqlalchemy-utils==0.36.5
+-e git+https://github.com/uc-cdis/cdis-python-utils.git@0.1.7#egg=cdispyutils
+-e git+https://github.com/NCI-GDC/indexd.git@2.3.1#egg=indexd
+-e git+https://github.com/uc-cdis/doiclient.git@1.0.0#egg=doiclient
+-e git+https://github.com/uc-cdis/dosclient.git@1.0.0#egg=dosclient
+-e git+https://github.com/uc-cdis/cdislogging.git@0.0.2#egg=cdislogging

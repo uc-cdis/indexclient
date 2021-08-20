@@ -14,8 +14,10 @@ UPDATABLE_ATTRS = [
     "version",
     "metadata",
     "acl",
-    "authz",
     "urls_metadata",
+    "authz",
+    "hashes",
+    "size",
 ]
 
 
@@ -124,7 +126,6 @@ class IndexClient(object):
 
         Args:
             dids (list): list of dids for potential documents
-
         Returns:
             list: Document objects representing  index records
         """
@@ -138,6 +139,32 @@ class IndexClient(object):
             else:
                 raise exception
 
+        return [Document(self, doc["did"], json=doc) for doc in response.json()]
+
+    def bulk_get_latest(self, dids, skip_null=False):
+        """
+        bulk get latest version
+        Args:
+            dids (list): list of dids
+            skip_null (boolean): skip null version
+
+        Returns:
+            list: Document objects
+
+        """
+        headers = {"content-type": "application/json"}
+        try:
+            response = self._post(
+                "bulk/documents/latest",
+                params={"skip_null": skip_null},
+                json=dids,
+                headers=headers,
+            )
+        except requests.HTTPError as exception:
+            if exception.response.status_code == 404:
+                return None
+            else:
+                raise exception
         return [Document(self, doc["did"], json=doc) for doc in response.json()]
 
     def get_with_params(self, params=None):
@@ -436,20 +463,17 @@ class Document(object):
     def __eq__(self, other_doc):
         """
         equals `==` operator overload
-
-        It doesn't matter the order of the urls list. What matters is the
-        existence of the urls are the same on both sides.
         """
-        return self._sorted_doc == other_doc._sorted_doc
+        return self.did == other_doc.did
 
     def __ne__(self, other_doc):
         """
         not equals `!=` operator overload
-
-        It doesn't matter the order of the urls list. What matters is the
-        existence of the urls are the same on both sides.
         """
-        return self._sorted_doc != other_doc._sorted_doc
+        return self.did != other_doc.did
+
+    def __hash__(self):
+        return hash(self.did)
 
     def __lt__(self, other_doc):
         return self.did < other_doc.did

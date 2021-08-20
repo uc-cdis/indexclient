@@ -1,4 +1,5 @@
 import pytest
+import uuid
 
 from indexclient.client import Document, recursive_sort
 
@@ -13,6 +14,8 @@ def create_document(
     urls=None,
     urls_metadata=None,
 ):
+
+    did = str(uuid.uuid4()) if did is None else did
 
     return Document(
         None,
@@ -31,8 +34,8 @@ def create_document(
 
 
 def test_equals():
-    doc1 = create_document()
-    doc2 = create_document()
+    doc1 = create_document(did="11111111-1111-1111-1111-111111111111")
+    doc2 = create_document(did="11111111-1111-1111-1111-111111111111")
     assert doc1 == doc2
 
     # Out of order values are still equal because the contents are the same.
@@ -52,10 +55,10 @@ def test_less_than():
     doc2 = create_document(did="11111111-1111-1111-1111-111111111112")
     assert doc1 < doc2
 
-    # reverse order docs
+    # reverse order docs (note that 10 would naturally sort next to 1, not after 9)
     docs = [
         create_document(did="11111111-1111-1111-1111-11111111111" + str(suffix))
-        for suffix in range(10, 0, -1)
+        for suffix in range(9, 0, -1)
     ]
     # sorted() sorts it in order from lowest to highest did because of __lt__/__gt__
     assert sorted(docs) == docs[::-1]
@@ -65,6 +68,12 @@ def test_greater_than():
     doc1 = create_document(did="11111111-1111-1111-1111-111111111111")
     doc2 = create_document(did="11111111-1111-1111-1111-111111111112")
     assert doc2 > doc1
+    assert doc1 < doc2
+
+
+def test_greater_than_less_than():
+    doc1 = create_document(did="11111111-1111-1111-1111-111111111111")
+    doc2 = create_document(did="11111111-1111-1111-1111-111111111112")
 
     # reverse order docs
     docs = [
@@ -72,7 +81,10 @@ def test_greater_than():
         for suffix in range(10, 0, -1)
     ]
     # sorted() sorts it in order from lowest to highest did because of __lt__/__gt__
-    assert sorted(docs) == docs[::-1]
+    did = sorted(docs)[0].did
+    for doc in sorted(docs)[1:]:
+        assert doc.did > did
+        did = doc.did
 
 
 @pytest.mark.parametrize(
