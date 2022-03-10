@@ -1,7 +1,7 @@
 import pytest
 import uuid
 
-from indexclient.client import Document, recursive_sort
+from indexclient.client import Document, recursive_sort, UrlMetadata
 
 
 def create_document(
@@ -53,6 +53,7 @@ def test_greater_than_less_than():
         assert doc.did > did
         did = doc.did
 
+
 @pytest.mark.parametrize('given, expected', [
     (1, 1),
     ('one', 'one'),
@@ -62,3 +63,64 @@ def test_greater_than_less_than():
 ])
 def test_recursive_sort(given, expected):
     assert recursive_sort(given) == expected
+
+
+TEST_URL = "fake_cleversafe_url"
+TEST_STATE = "test_state"
+TEST_URL_TYPE = "cleversafe"
+TEST_URL_METADATA = UrlMetadata(
+    url=TEST_URL, type=TEST_URL_TYPE, state=TEST_STATE
+)
+
+
+def create_doc_with_url():
+    doc = create_document(
+        urls=[TEST_URL],
+        urls_metadata={
+            TEST_URL: {"state": TEST_STATE, "type": TEST_URL_TYPE}
+        }
+    )
+
+    return doc
+
+
+def test_get_url_metadata():
+    doc = create_doc_with_url()
+    assert doc.get_url_metadata_by_type(url_type=TEST_URL_TYPE) == TEST_URL_METADATA
+
+
+def test_get_url_metadata_negative():
+    doc = create_doc_with_url()
+    assert doc.get_url_metadata_by_type(url_type="dummy") is None
+
+
+def test_get_url_by_type():
+    doc = create_doc_with_url()
+    assert doc.get_url_by_url_type(url_type=TEST_URL_TYPE) == TEST_URL
+
+
+def test_get_url_by_type_negative():
+    doc = create_doc_with_url()
+    assert doc.get_url_by_url_type(url_type="dummy") is None
+
+
+def test_get_state_by_type():
+    doc = create_doc_with_url()
+    assert doc.get_state_by_url_type(url_type=TEST_URL_TYPE) == TEST_STATE
+
+
+def test_get_state_by_type_negative():
+    doc = create_doc_with_url()
+    assert doc.get_state_by_url_type(url_type="dummy") is None
+
+
+def test_get_state_by_type_missing_state():
+    doc = create_document(
+        urls=[TEST_URL],
+        urls_metadata={TEST_URL: {"type": TEST_URL_TYPE}}
+    )
+    url_metadata = doc.get_url_metadata_by_type(url_type=TEST_URL_TYPE)
+    assert url_metadata
+
+    state = doc.get_state_by_url_type(url_type=TEST_URL_TYPE)
+    assert state is None

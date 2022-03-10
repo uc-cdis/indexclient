@@ -3,6 +3,7 @@ try:
 except ImportError:
     from urllib.parse import urljoin
 
+import collections
 import copy
 import json
 
@@ -13,6 +14,9 @@ UPDATABLE_ATTRS = [
     'metadata', 'acl', 'urls_metadata',
     'hashes', 'size'
 ]
+
+
+UrlMetadata = collections.namedtuple("UrlMetadata", ["url", "type", "state"])
 
 
 def json_dumps(data):
@@ -355,7 +359,6 @@ class IndexClient(object):
             params["limit"] = min(limit, page_size)
             params["offset"] += len(response)
 
-
     def query_url(self, exclude=None, include=None, versioned=False, fields=None, limit=100, offset=0, page_size=100):
         """ Queries indexd entries using URL patterns, which can be either full or partial URLs
         Args:
@@ -479,7 +482,7 @@ class Document(object):
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
         # set attributes to current Document
-        for k,v in json.items():
+        for k, v in json.items():
             self.__dict__[k] = v
         self._attrs = json.keys()
         self._fetched = True
@@ -525,6 +528,66 @@ class Document(object):
                             auth=self.client.auth,
                             params={"rev": self.rev})
         self._deleted = True
+
+    def get_url_metadata_by_type(self, url_type):
+        """
+        Gets the corresponding url_metadata with specified url_type.
+
+        Parameters:
+            url_type (str): desired type of URL
+
+        Returns:
+            A UrlMetadata object representing the metadata
+        """
+        urls_metadata = self._doc.get("urls_metadata", {})
+        requested_metadata = [
+            UrlMetadata(
+                url=url, state=metadata.get("state"), type=metadata.get("type"),
+            )
+            for url, metadata in urls_metadata.items()
+            if metadata.get("type") == url_type
+        ]
+
+        # Edge case, the following check can be removed after DEV-983
+        if len(requested_metadata) > 1:
+            raise ValueError("multiple urls of the request type within this Document")
+
+        if requested_metadata:
+            return requested_metadata[0]
+        else:
+            return None
+
+    def get_url_by_url_type(self, url_type):
+        """
+        Gets the URL of the requested url_type from the document
+
+        Parameters:
+            url_type (str): the requested type of URL
+
+        Returns:
+            str: the URL of requested url type
+        """
+        url_metadata = self.get_url_metadata_by_type(url_type=url_type)
+        if url_metadata:
+            return url_metadata.url
+        else:
+            return None
+
+    def get_state_by_url_type(self, url_type):
+        """
+        Gets state of the requested url_type from the document
+
+        Parameters:
+            url_type (str): the requested type of URL
+
+        Returns:
+            str: the state of requested url_type
+        """
+        url_metadata = self.get_url_metadata_by_type(url_type=url_type)
+        if url_metadata:
+            return url_metadata.state
+        else:
+            return None
 
 
 def recursive_sort(value):
