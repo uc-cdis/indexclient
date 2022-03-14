@@ -1,7 +1,6 @@
 import sys
 import json
 import logging
-import argparse
 
 import requests
 
@@ -23,13 +22,13 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
 
     if len(hash_dict) < len(hash_set):
         logging.error('multiple incompatible hashes specified')
-        
+
         for h in hash_dict.items():
             hash_set.remove(h)
-        
+
         for h, _ in hash_set:
             logging.error('multiple values specified for {h}'.format(h=h))
-        
+
         raise ValueError('conflicting hashes provided')
 
     hashes = [':'.join([h,v]) for h,v in hash_dict.items()]
@@ -74,13 +73,13 @@ def search_names(host, port, limit, start, size, hashes, **kwargs):
 
     if len(hash_dict) < len(hash_set):
         logging.error('multiple incompatible hashes specified')
-        
+
         for h in hash_dict.items():
             hash_set.remove(h)
-        
+
         for h, _ in hash_set:
             logging.error('multiple values specified for {h}'.format(h=h))
-        
+
         raise ValueError('conflicting hashes provided')
 
     hashes = [':'.join([h,v]) for h,v in hash_dict.items()]

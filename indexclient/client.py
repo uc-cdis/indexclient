@@ -1,11 +1,7 @@
-try:
-    from urlparse import urljoin
-except ImportError:
-    from urllib.parse import urljoin
-
 import collections
 import copy
 import json
+from urllib.parse import urljoin
 
 import requests
 

@@ -1,8 +1,4 @@
-# Python 2 and 3 compatible
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+from unittest.mock import patch
 
 
 def test_import_index():

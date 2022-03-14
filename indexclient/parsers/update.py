@@ -1,6 +1,5 @@
 import sys
 import json
-import argparse
 
 import requests
 
@@ -31,13 +30,13 @@ def update_record(host, port, did, rev, size, hashes, urls, **kwargs):
 
     if len(hash_dict) < len(hash_set):
         logging.error('multiple incompatible hashes specified')
-        
+
         for h in hash_dict.items():
             hash_set.remove(h)
-        
+
         for h, _ in hash_set:
             logging.error('multiple values specified for {h}'.format(h=h))
-        
+
         raise ValueError('conflicting hashes provided')
 
     data = {

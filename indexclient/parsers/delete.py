@@ -1,8 +1,3 @@
-import sys
-import json
-import logging
-import argparse
-
 import requests
 
 from indexclient.errors import BaseIndexError
