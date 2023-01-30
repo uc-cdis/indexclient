@@ -175,7 +175,7 @@ class IndexClient(object):
         return Document(self, did, json=json)
 
     def list(self, limit=float("inf"), start=None, page_size=100):
-        """ Returns a generator of document objects. """
+        """Returns a generator of document objects."""
         return self.list_with_params(limit, start, page_size)
 
     def list_with_params(
@@ -304,7 +304,7 @@ class IndexClient(object):
         """
         alias_payload = {"aliases": [{"value": alias}]}
         resp = self._post(
-            "index/{}/aliases/".format(did),
+            "index/{}/aliases".format(did),
             headers={"content-type": "application/json"},
             data=json.dumps(alias_payload),
             auth=self.auth,
@@ -488,7 +488,7 @@ class Document(object):
         return json
 
     def _load(self, json=None):
-        """ Load the document contents from the server or from the provided dictionary """
+        """Load the document contents from the server or from the provided dictionary"""
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
         # set attributes to current Document
