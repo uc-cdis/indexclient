@@ -3,19 +3,15 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[packages]
+requests = "*"
+indexclient = {editable = true, path = "."}
+
 [dev-packages]
 pytest = "*"
 mock = "*"
-cdisutilstest = {editable = true,git = "https://github.com/uc-cdis/cdisutils-test.git",ref = "1.0.0"}
-indexd = {editable = true,git = "https://github.com/uc-cdis/indexd.git",ref = "2.4.0"}
-doiclient = {editable = true,git = "https://github.com/uc-cdis/doiclient.git",ref = "1.0.0"}
-dosclient = {editable = true,git = "https://github.com/uc-cdis/dosclient.git",ref = "1.0.0"}
-hsclient = {editable = true,git = "https://github.com/uc-cdis/hsclient.git",ref = "1.0.0"}
-cdislogging = {editable = true,git = "https://github.com/uc-cdis/cdislogging.git",ref = "1.0.0"}
-
-[packages]
-requests = "*"
-indexclient = {editable = true,path = "."}
+cdisutilstest = {editable = true, git = "https://github.com/uc-cdis/cdisutils-test.git", ref = "1.0.0"}
+indexd = {git = "https://github.com/uc-cdis/indexd.git", ref = "4.0.2"}
 
 [requires]
 python_version = "3.9"
