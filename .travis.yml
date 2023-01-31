@@ -1,6 +1,6 @@
 language: python
 python:
-- '3.6'
+- '3.9'
 sudo: false
 env:
   global:
@@ -10,7 +10,7 @@ install:
 - pip install pipenv
 - pipenv install --dev --deploy --python `which python`
 - pipenv graph
-script: pipenv run py.test -vv
+script: pipenv run pytest -vv
 before_deploy:
 - sed -i.bak "s/=get_version()/='$TRAVIS_TAG'/g" setup.py
 - cat setup.py
@@ -21,7 +21,7 @@ deploy:
   skip_existing: true
   skip_cleanup: true
   on:
-    python: 3.6
+    python: 3.9
     repo: uc-cdis/indexclient
     tags: true
   password:
