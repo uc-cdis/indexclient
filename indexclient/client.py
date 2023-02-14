@@ -242,6 +242,7 @@ class IndexClient(object):
         urls_metadata=None,
         version=None,
         authz=None,
+        description=None,
     ):
         """Create a new entry in indexd
 
@@ -258,6 +259,7 @@ class IndexClient(object):
             urls_metadata (dict): metadata attached to each url
             baseid (str): optional baseid to group with previous entries versions
             version (str): entry version string
+            description (str): a description for the record.
         Returns:
             Document: indexclient representation of an entry in indexd
         """
@@ -276,6 +278,7 @@ class IndexClient(object):
             "acl": acl,
             "authz": authz,
             "version": version,
+            "description": description,
         }
         if did:
             json["did"] = did
