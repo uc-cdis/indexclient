@@ -15,10 +15,11 @@ provides a minimum list of requirements and allows for deployment on a wide
 range of systems with next to no configuration overhead. That said, it is
 highly recommended to use pip and a virtualenv to isolate the installation.
 
-To install the prototype implementation, simply run
+To install the implementation, simply run
 
 ```bash
-pip install .
+pip install pipenv
+pipenv install
 ```
 
 ## Configuration

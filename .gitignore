@@ -66,3 +66,9 @@ settings.yaml
 
 # sqlite
 *.sq3
+
+# IDE directories
+.idea
+
+# pyenv
+.python-version
