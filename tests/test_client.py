@@ -218,6 +218,14 @@ def test_updating_authz(index_client):
     assert same_doc.authz == ["/gen3/programs/a"]
 
 
+def test_updating_description(index_client):
+    doc = create_random_index(index_client)
+    doc.description = "a new description"
+    doc.patch()
+    updated_doc = index_client.get(doc.did)
+    assert updated_doc.description == "a new description"
+
+
 def test_bulk_request(index_client):
     dids = [create_random_index(index_client).did for _ in range(20)]
 
