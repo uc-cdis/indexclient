@@ -16,6 +16,7 @@ UPDATABLE_ATTRS = [
     "acl",
     "authz",
     "urls_metadata",
+    "description",
 ]
 
 

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f67affd8f6e88a3c81bee68f24b05990ec55eea7ae8f6e83cf7766f41f1cfb80"
+            "sha256": "4f758d4e2234e7f2a66b980b3cd17d8946315712b80c7050468702086e8e8826"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -198,7 +198,7 @@
         "cdisutilstest": {
             "editable": true,
             "git": "https://github.com/uc-cdis/cdisutils-test.git",
-            "ref": "bdfdeb05e45407e839fd954ce6d195d847cd8024"
+            "ref": "6b38a6cfa34e907baa1ac8fb180a45092423118d"
         },
         "certifi": {
             "hashes": [
@@ -477,7 +477,7 @@
         },
         "indexd": {
             "git": "https://github.com/uc-cdis/indexd.git",
-            "ref": "df7eaf14d302449d4f9b780af4a22f66cce70057"
+            "ref": "3b3fa7e034d83083d99dd9f4c802c817434a858e"
         },
         "iniconfig": {
             "hashes": [
@@ -723,11 +723,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:15136a251127da2d2e77ac7a1bc231eb504654f7e3346d93613a13f2e2787535",
-                "sha256:1c39d42bda4cb89f7fdcad52b6762e3c309ec8f8715b27c684176b7d71283242"
+                "sha256:2ee892cd5f29f3373097f5a814697e397cf3ce313616df0af11231e2ad118077",
+                "sha256:b78aaa36f6b90a074c1fa651168723acbf45d14cb1196b6f02c0fd07f17623b2"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==67.5.1"
+            "version": "==67.6.0"
         },
         "six": {
             "hashes": [
