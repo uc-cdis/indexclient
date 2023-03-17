@@ -10,8 +10,8 @@ indexclient = {editable = true, path = "."}
 [dev-packages]
 pytest = "*"
 mock = "*"
-cdisutilstest = {editable = true, git = "https://github.com/uc-cdis/cdisutils-test.git", ref = "1.1.0"}
-indexd = {git = "https://github.com/uc-cdis/indexd.git", ref = "master"}
+cdisutilstest = {editable = true, git = "https://github.com/uc-cdis/cdisutils-test.git", ref = "1.0.0"}
+indexd = {git = "https://github.com/uc-cdis/indexd.git", ref = "4.0.2"}
 
 [requires]
 python_version = "3.9"
