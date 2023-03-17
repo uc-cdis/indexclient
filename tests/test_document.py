@@ -13,7 +13,6 @@ def create_document(
     urls=None,
     urls_metadata=None,
 ):
-
     return Document(
         None,
         did,

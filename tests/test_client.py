@@ -206,7 +206,6 @@ def test_bulk_request(index_client):
 
 
 def test_add_alias_for_did(index_client):
-
     # Create a record in indexd and retrieve the did
     did = create_random_index(index_client).did
 
