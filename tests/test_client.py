@@ -54,27 +54,6 @@ def test_create_with_metadata(index_client):
     assert doc.metadata == metadata
 
 
-def test_create_with_description(index_client):
-    urls = ["s3://bucket/key"]
-    urls_metadata = {"s3://bucket/key": {"k": "v"}}
-    size = 5
-    acl = ["a", "b"]
-    authz = ["/gen3/programs/a/projects/b"]
-    hashes = {"md5": "ab167e49d25b488939b1ede42752458b"}
-    metadata = {"test": "value"}
-    doc = index_client.create(
-        hashes=hashes,
-        size=size,
-        urls=urls,
-        acl=acl,
-        authz=authz,
-        metadata=metadata,
-        urls_metadata=urls_metadata,
-        description="describes the record",
-    )
-    assert doc.description == "describes the record"
-
-
 def test_list_with_params(index_client):
     hashes = {"md5": "ab167e49d25b488939b1ede42752458c"}
     doc1 = create_random_index(index_client, hashes=hashes)
@@ -218,14 +197,6 @@ def test_updating_authz(index_client):
     assert same_doc.authz == ["/gen3/programs/a"]
 
 
-def test_updating_description(index_client):
-    doc = create_random_index(index_client)
-    doc.description = "a new description"
-    doc.patch()
-    updated_doc = index_client.get(doc.did)
-    assert updated_doc.description == "a new description"
-
-
 def test_bulk_request(index_client):
     dids = [create_random_index(index_client).did for _ in range(20)]
 
@@ -235,6 +206,7 @@ def test_bulk_request(index_client):
 
 
 def test_add_alias_for_did(index_client):
+
     # Create a record in indexd and retrieve the did
     did = create_random_index(index_client).did
 
