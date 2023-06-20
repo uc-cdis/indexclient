@@ -66,3 +66,5 @@ settings.yaml
 
 # sqlite
 *.sq3
+.idea
+.python-version

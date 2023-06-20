@@ -16,6 +16,9 @@ UPDATABLE_ATTRS = [
     "acl",
     "authz",
     "urls_metadata",
+    "description",
+    "content_created_date",
+    "content_updated_date",
 ]
 
 
@@ -26,8 +29,8 @@ def json_dumps(data):
 def handle_error(resp):
     if 400 <= resp.status_code < 600:
         try:
-            json = resp.json()
-            resp.reason = json["error"]
+            json_resp = resp.json()
+            resp.reason = json_resp["error"]
         except (json.decoder.JSONDecodeError, KeyError):
             pass
         finally:
@@ -242,6 +245,9 @@ class IndexClient(object):
         urls_metadata=None,
         version=None,
         authz=None,
+        description=None,
+        content_created_date=None,
+        content_updated_date=None,
     ):
         """Create a new entry in indexd
 
@@ -276,6 +282,9 @@ class IndexClient(object):
             "acl": acl,
             "authz": authz,
             "version": version,
+            "description": description,
+            "content_created_date": content_created_date,
+            "content_updated_date": content_updated_date,
         }
         if did:
             json["did"] = did
