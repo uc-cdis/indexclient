@@ -12,8 +12,8 @@ pytest = "*"
 mock = "*"
 # PyPI does not allow these direct references.
 # Uncomment for development, comment out after passing unit tests in github/travis.
-cdisutilstest = {editable = true, git = "https://github.com/uc-cdis/cdisutils-test.git", ref = "1.0.0"}
-indexd = {git = "https://github.com/uc-cdis/indexd.git", ref = "5.0.1"}
+# cdisutilstest = {editable = true, git = "https://github.com/uc-cdis/cdisutils-test.git", ref = "1.0.0"}
+# indexd = {git = "https://github.com/uc-cdis/indexd.git", ref = "5.0.1"}
 
 [requires]
 python_version = "3.9"
