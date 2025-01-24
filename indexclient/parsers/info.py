@@ -25,9 +25,7 @@ def info(host, port, name, **kwargs):
         ),
         DeprecationWarning,
     )
-    resource = "http://{host}:{port}/alias/{name}".format(
-        host=host, port=port, name=name
-    )
+    resource = f"http://{host}:{port}/alias/{name}"
 
     res = requests.get(resource)
 

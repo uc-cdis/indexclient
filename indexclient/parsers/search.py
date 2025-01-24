@@ -25,17 +25,17 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
     if len(hash_dict) < len(hash_set):
         logging.error("multiple incompatible hashes specified")
 
-        for h in hash_dict.items():
-            hash_set.remove(h)
+        for hash in hash_dict.items():
+            hash_set.remove(hash)
 
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
+        for hash, _ in hash_set:
+            logging.error(f"multiple values specified for {hash}")
 
         raise ValueError("conflicting hashes provided")
 
     hashes = [":".join([h, v]) for h, v in hash_dict.items()]
 
-    resource = "http://{host}:{port}/index/".format(host=host, port=port)
+    resource = f"http://{host}:{port}/index/"
 
     params = {"limit": limit, "start": start, "hash": hashes, "size": size}
 
@@ -83,17 +83,17 @@ def search_names(host, port, limit, start, size, hashes, **kwargs):
     if len(hash_dict) < len(hash_set):
         logging.error("multiple incompatible hashes specified")
 
-        for h in hash_dict.items():
-            hash_set.remove(h)
+        for hash in hash_dict.items():
+            hash_set.remove(hash)
 
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
+        for hash, _ in hash_set:
+            logging.error("multiple values specified for {hash}")
 
         raise ValueError("conflicting hashes provided")
 
     hashes = [":".join([h, v]) for h, v in hash_dict.items()]
 
-    resource = "http://{host}:{port}/alias/".format(host=host, port=port)
+    resource = f"http://{host}:{port}/alias/"
 
     params = {"limit": limit, "start": start, "size": size, "hashes": hashes}
 

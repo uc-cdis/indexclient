@@ -67,9 +67,9 @@ def test_list_with_params(index_client):
     )
     dids = [doc1.did, doc2.did]
     found = []
-    for d in docs_with_hashes:
-        if d.did in dids:
-            found.append(d.did)
+    for doc in docs_with_hashes:
+        if doc.did in dids:
+            found.append(doc.did)
     assert set(dids) == set(found)
 
 
@@ -238,9 +238,5 @@ def test_add_alias_for_did(index_client):
     # Confirm that we can retrieve the original document using this alias
     # on the global_get endpoint
     doc = index_client.global_get(alias)
-    assert doc is not None, "Failed to retrieve document {} using alias {}".format(
-        did, alias
-    )
-    assert doc.did == did, "Retrieved incorrect document {}, expected {}".format(
-        did, alias
-    )
+    assert doc is not None, f"Failed to retrieve document {did} using alias {alias}"
+    assert doc.did == did, f"Retrieved incorrect document {did}, expected {alias}"

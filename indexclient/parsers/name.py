@@ -1,3 +1,4 @@
+import logging
 import sys
 import json
 import argparse
@@ -26,9 +27,7 @@ def name_record(
         ),
         DeprecationWarning,
     )
-    resource = "http://{host}:{port}/alias/{name}".format(
-        host=host, port=port, name=name
-    )
+    resource = f"http://{host}:{port}/alias/{name}"
 
     params = {"rev": rev}
 
@@ -43,11 +42,11 @@ def name_record(
     if len(hash_dict) < len(hash_set):
         logging.error("multiple incompatible hashes specified")
 
-        for h in hash_dict.items():
-            hash_set.remove(h)
+        for hash in hash_dict.items():
+            hash_set.remove(hash)
 
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
+        for hash, _ in hash_set:
+            logging.error(f"multiple values specified for {hash}")
 
         raise ValueError("conflicting hashes provided")
 
