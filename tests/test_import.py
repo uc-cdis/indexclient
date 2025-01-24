@@ -15,6 +15,8 @@ def test_import_index():
 @patch("indexclient.client.handle_error")
 @patch("requests.get")
 def test_hashes(get_request_mock, handle_error_mock):
+    """Test get_with_params"""
+
     from indexclient.client import IndexClient
 
     input_params = {"hashes": {"md5": "00000000000000000000000000000001"}, "size": "1"}

@@ -7,6 +7,7 @@ from requests import HTTPError
 
 
 def test_instantiate(index_client):
+    """Test create method"""
     baseid = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
     urls = ["s3://url/bucket/key"]
     urls_metadata = {url: {"state": "doing ok"} for url in urls}
@@ -34,6 +35,7 @@ def test_instantiate(index_client):
 
 
 def test_create_with_metadata(index_client):
+    """Test create with metadata"""
     urls = ["s3://bucket/key"]
     urls_metadata = {"s3://bucket/key": {"k": "v"}}
     size = 5
@@ -55,6 +57,7 @@ def test_create_with_metadata(index_client):
 
 
 def test_list_with_params(index_client):
+    """Test list_with_params"""
     hashes = {"md5": "ab167e49d25b488939b1ede42752458c"}
     doc1 = create_random_index(index_client, hashes=hashes)
     doc2 = create_random_index(index_client, hashes=hashes)
@@ -71,6 +74,7 @@ def test_list_with_params(index_client):
 
 
 def test_list_with_params_negate(index_client):
+    """Test list_with_params with negate_params"""
     doc1 = create_random_index(index_client, version="1")
     create_random_index(index_client, version="2")
 
@@ -82,6 +86,8 @@ def test_list_with_params_negate(index_client):
 
 def test_get_latest_version(index_client):
     """
+    Test get_latest_version
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -94,6 +100,8 @@ def test_get_latest_version(index_client):
 
 def test_get_latest_version_with_skip(index_client):
     """
+    Test get_latest_version with skip
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -109,6 +117,7 @@ def test_get_latest_version_with_skip(index_client):
 @pytest.mark.parametrize("arg, exception", [("AAA", HTTPError), (None, TypeError)])
 def test_invalid_input(arg, exception, index_client):
     """
+    Test get_latest_version with invalid input
     Args:
         arg(str): uuid
         exception (Exception): Exception class
@@ -121,6 +130,8 @@ def test_invalid_input(arg, exception, index_client):
 
 def test_add_version(index_client):
     """
+    Test get_latest_version with added version
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -138,6 +149,8 @@ def test_add_version(index_client):
 
 def test_list_versions(index_client):
     """
+    Test list_versions
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -154,6 +167,8 @@ def test_list_versions(index_client):
 
 def test_updating_metadata(index_client):
     """
+    Test updating metadata
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -171,6 +186,8 @@ def test_updating_metadata(index_client):
 
 def test_updating_acl(index_client):
     """
+    Test updating acl
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -185,6 +202,8 @@ def test_updating_acl(index_client):
 
 def test_updating_authz(index_client):
     """
+    Test updating authz
+
     Args:
         index_client (indexclient.client.IndexClient): IndexClient Pytest Fixture
     """
@@ -198,6 +217,7 @@ def test_updating_authz(index_client):
 
 
 def test_bulk_request(index_client):
+    """Test bulk_request"""
     dids = [create_random_index(index_client).did for _ in range(20)]
 
     docs = index_client.bulk_request(dids)
@@ -206,6 +226,8 @@ def test_bulk_request(index_client):
 
 
 def test_add_alias_for_did(index_client):
+    """Test add_alias_for_did"""
+
     # Create a record in indexd and retrieve the did
     did = create_random_index(index_client).did
 

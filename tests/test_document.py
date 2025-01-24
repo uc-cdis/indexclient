@@ -13,6 +13,7 @@ def create_document(
     urls=None,
     urls_metadata=None,
 ):
+    """Create a test manifest"""
     return Document(
         None,
         did,
@@ -30,6 +31,7 @@ def create_document(
 
 
 def test_equals():
+    """Test if manifests are equal when value order is different"""
     doc1 = create_document()
     doc2 = create_document()
     assert doc1 == doc2
@@ -41,12 +43,14 @@ def test_equals():
 
 
 def test_not_equals():
+    """Test if two manifests are not equal"""
     doc1 = create_document(acl=["1", "2"])
     doc2 = create_document(acl=["2", "3"])
     assert doc1 != doc2
 
 
 def test_less_than():
+    """Test if manifest is lexically less than other manifest"""
     doc1 = create_document(did="11111111-1111-1111-1111-111111111111")
     doc2 = create_document(did="11111111-1111-1111-1111-111111111112")
     assert doc1 < doc2
@@ -61,6 +65,7 @@ def test_less_than():
 
 
 def test_greater_than():
+    """Test if manifest is lexically greater than other manifest"""
     doc1 = create_document(did="11111111-1111-1111-1111-111111111111")
     doc2 = create_document(did="11111111-1111-1111-1111-111111111112")
     assert doc2 > doc1
@@ -85,4 +90,5 @@ def test_greater_than():
     ],
 )
 def test_recursive_sort(given, expected):
+    """Test recursive sorting"""
     assert recursive_sort(given) == expected
