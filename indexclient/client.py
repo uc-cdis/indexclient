@@ -23,10 +23,12 @@ UPDATABLE_ATTRS = [
 
 
 def json_dumps(data):
+    """local utility function to dump dictionary"""
     return json.dumps({k: v for (k, v) in data.items() if v is not None})
 
 
 def handle_error(resp):
+    """local utility function to raise exception"""
     if 400 <= resp.status_code < 600:
         try:
             json_resp = resp.json()
@@ -38,6 +40,8 @@ def handle_error(resp):
 
 
 def timeout_wrapper(func):
+    """local utility decorator"""
+
     def timeout(*args, **kwargs):
         kwargs.setdefault("timeout", 60)
         return func(*args, **kwargs)
@@ -46,6 +50,8 @@ def timeout_wrapper(func):
 
 
 def retry_and_timeout_wrapper(func):
+    """local utility decorator to add retry and timeout"""
+
     def retry_logic_with_timeout(*args, **kwargs):
         kwargs.setdefault("timeout", 60)
         retries = 0
@@ -93,11 +99,11 @@ class IndexClient(object):
                 response = self._get(did, params={"no_dist": ""})
             else:
                 response = self._get(did)
-        except requests.HTTPError as e:
-            if e.response.status_code == 404:
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
                 return None
             else:
-                raise e
+                raise err
 
         return Document(self, did, json=response.json())
 
@@ -112,11 +118,11 @@ class IndexClient(object):
         """
         try:
             response = self._get("index", did)
-        except requests.HTTPError as e:
-            if e.response.status_code == 404:
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
                 return None
             else:
-                raise e
+                raise err
 
         return Document(self, did, json=response.json())
 
@@ -166,11 +172,11 @@ class IndexClient(object):
 
         try:
             response = self._get("index", params=reformatted_params)
-        except requests.HTTPError as e:
-            if e.response.status_code == 404:
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
                 return None
             else:
-                raise e
+                raise err
         if not response.json()["records"]:
             return None
         json = response.json()["records"][0]
@@ -482,7 +488,7 @@ class Document(object):
         if self._deleted:
             raise DocumentDeletedError("document {} has been deleted".format(self.did))
 
-    def _render(self, include_rev=True):
+    def _render(self, include_rev=True):  # pylint: disable=unused-argument
         self._check_deleted()
         if not self._fetched:
             raise RuntimeError(
@@ -501,8 +507,8 @@ class Document(object):
         self._check_deleted()
         json = json or self.client._get("index", self.did).json()
         # set attributes to current Document
-        for k, v in json.items():
-            self.__dict__[k] = v
+        for key, value in json.items():
+            self.__dict__[key] = value
         self._attrs = json.keys()
         self._fetched = True
 
@@ -545,6 +551,7 @@ class Document(object):
         self._load()  # to sync new rev from server
 
     def delete(self):
+        """delete and mark as deleted"""
         self._check_deleted()
         self.client._delete(
             "index", self.did, auth=self.client.auth, params={"rev": self.rev}
