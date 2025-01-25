@@ -160,7 +160,7 @@ class IndexClient(object):
         params_copy = copy.deepcopy(params) or {}
         if "hashes" in params_copy:
             params_copy["hash"] = params_copy.pop("hashes")
-        reformatted_params = dict()
+        reformatted_params = {}
         for param in ["hash", "metadata"]:
             if param in params_copy:
                 reformatted_params[param] = []
@@ -208,12 +208,12 @@ class IndexClient(object):
             params_copy["hash"] = params_copy.pop("hashes")
         if "urls_metadata" in params_copy:
             params_copy["urls_metadata"] = json.dumps(params_copy.pop("urls_metadata"))
-        reformatted_params = dict()
+        reformatted_params = {}
         for param in ["hash", "metadata"]:
             if param in params_copy:
                 reformatted_params[param] = []
-                for k, v in params_copy[param].items():
-                    reformatted_params[param].append(str(k) + ":" + str(v))
+                for key, value in params_copy[param].items():
+                    reformatted_params[param].append(str(key) + ":" + str(value))
                 del params_copy[param]
         reformatted_params.update(params_copy)
         reformatted_params.update({"limit": page_size, "start": start})
@@ -319,7 +319,7 @@ class IndexClient(object):
         """
         alias_payload = {"aliases": [{"value": alias}]}
         resp = self._post(
-            "index/{}/aliases".format(did),
+            f"index/{did}/aliases",
             headers={"content-type": "application/json"},
             data=json.dumps(alias_payload),
             auth=self.auth,
@@ -327,9 +327,7 @@ class IndexClient(object):
         try:
             return resp.json()
         except ValueError as err:
-            reason = json.dumps(
-                {"error": "invalid json payload returned: {}".format(err)}
-            )
+            reason = json.dumps({"error": f"invalid json payload returned: {err}"})
             raise BaseIndexError(resp.status_code, reason)
 
     # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
@@ -346,6 +344,7 @@ class IndexClient(object):
         host_authorities=None,
         keeper_authority=None,
     ):
+        """create alias"""
         warnings.warn(
             (
                 "This function is deprecated. For creating aliases for indexd "
@@ -371,6 +370,8 @@ class IndexClient(object):
 
     def get_latest_version(self, did, skip_null_versions=False):
         """
+        Get latest version
+
         Args:
             did (str): document id of an existing entry whose latest version is requested
             skip_null_versions (bool): if True, exclude entries without a version
@@ -387,6 +388,7 @@ class IndexClient(object):
 
     def add_version(self, current_did, new_doc):
         """
+        Add version
 
         Args:
             current_did (str): did of an existing index whose baseid will be shared
@@ -403,11 +405,11 @@ class IndexClient(object):
         return None
 
     def list_versions(self, did):
-        # type: (str) -> list[Document]
-        versions_dict = self._get("index", did, "versions").json()  # type: dict
+        """get list of versions, returns list of dicts"""
+        versions_dict = self._get("index", did, "versions").json()
         versions = []
 
-        for _, version in versions_dict.items():
+        for version in versions_dict.values():
             versions.append(Document(self, version["did"], version))
         return versions
 
@@ -480,13 +482,13 @@ class Document(object):
             <Document(size=1, form=object, file_name=filename.txt, ...)>
         """
         attributes = ", ".join(
-            ["{}={}".format(attr, self.__dict__[attr]) for attr in self._attrs]
+            [f"{attr}={self.__dict__[attr]}" for attr in self._attrs]
         )
         return "<Document(" + attributes + ")>"
 
     def _check_deleted(self):
         if self._deleted:
-            raise DocumentDeletedError("document {} has been deleted".format(self.did))
+            raise DocumentDeletedError(f"document {self.did} has been deleted")
 
     def _render(self, include_rev=True):  # pylint: disable=unused-argument
         self._check_deleted()
@@ -497,6 +499,7 @@ class Document(object):
         return self._doc
 
     def to_json(self, include_rev=True):
+        """local utility function to render document as json"""
         json = self._render(include_rev=include_rev)
         if self.did:
             json["did"] = self.did
