@@ -1,8 +1,3 @@
-import sys
-import json
-import logging
-import argparse
-
 import requests
 
 from indexclient.errors import BaseIndexError
@@ -21,7 +16,7 @@ def delete_record(host, port, did, rev, **kwargs):
     try:
         res.raise_for_status()
     except Exception as err:
-        raise BaseIndexError(res.status_code, res.text)
+        raise BaseIndexError(res.status_code, res.text) from err
 
 
 def config(parser):

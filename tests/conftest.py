@@ -1,7 +1,7 @@
 import pytest
 from cdisutilstest.code.conftest import (  # pylint: disable=unused-import
-    indexd_server,
     indexd_client,
+    indexd_server,
 )
 
 

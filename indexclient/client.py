@@ -66,15 +66,17 @@ def retry_and_timeout_wrapper(func):
     return retry_logic_with_timeout
 
 
-class IndexClient(object):
+class IndexClient:
     def __init__(self, baseurl, version="v0", auth=None):
         self.auth = auth
         self.url = baseurl
         self.version = version
 
     def url_for(self, *path):
-        subpath = "/".join(path).lstrip("/")
-        return "{}/{}".format(self.url.rstrip("/"), subpath)
+        """build url"""
+        parent_path = self.url.rstrip("/")
+        sub_path = "/".join(path).lstrip("/")
+        return f"{parent_path}/{sub_path}"
 
     def check_status(self):
         """Check that the API we are trying to communicate with is online"""
@@ -102,8 +104,7 @@ class IndexClient(object):
         except requests.HTTPError as err:
             if err.response.status_code == 404:
                 return None
-            else:
-                raise err
+            raise err
 
         return Document(self, did, json=response.json())
 
@@ -121,8 +122,7 @@ class IndexClient(object):
         except requests.HTTPError as err:
             if err.response.status_code == 404:
                 return None
-            else:
-                raise err
+            raise err
 
         return Document(self, did, json=response.json())
 
@@ -144,8 +144,7 @@ class IndexClient(object):
         except requests.HTTPError as exception:
             if exception.response.status_code == 404:
                 return None
-            else:
-                raise exception
+            raise exception
 
         return [Document(self, doc["did"], json=doc) for doc in response.json()]
 
@@ -164,8 +163,8 @@ class IndexClient(object):
         for param in ["hash", "metadata"]:
             if param in params_copy:
                 reformatted_params[param] = []
-                for k, v in params_copy[param].items():
-                    reformatted_params[param].append(str(k) + ":" + str(v))
+                for key, value in params_copy[param].items():
+                    reformatted_params[param].append(str(key) + ":" + str(value))
                 del params_copy[param]
         reformatted_params.update(params_copy)
         reformatted_params["limit"] = 1
@@ -175,13 +174,12 @@ class IndexClient(object):
         except requests.HTTPError as err:
             if err.response.status_code == 404:
                 return None
-            else:
-                raise err
+            raise err
         if not response.json()["records"]:
             return None
-        json = response.json()["records"][0]
-        did = json["did"]
-        return Document(self, did, json=json)
+        json_data = response.json()["records"][0]
+        did = json_data["did"]
+        return Document(self, did, json=json_data)
 
     def list(self, limit=float("inf"), start=None, page_size=100):
         """Returns a generator of document objects."""
@@ -276,7 +274,7 @@ class IndexClient(object):
 
         if urls is None:
             urls = []
-        json = {
+        json_data = {
             "urls": urls,
             "form": "object",
             "hashes": hashes,
@@ -293,11 +291,11 @@ class IndexClient(object):
             "content_updated_date": content_updated_date,
         }
         if did:
-            json["did"] = did
+            json_data["did"] = did
         resp = self._post(
             "index/",
             headers={"content-type": "application/json"},
-            data=json_dumps(json),
+            data=json_dumps(json_data),
             auth=self.auth,
         )
         return Document(self, resp.json()["did"])
@@ -328,7 +326,7 @@ class IndexClient(object):
             return resp.json()
         except ValueError as err:
             reason = json.dumps({"error": f"invalid json payload returned: {err}"})
-            raise BaseIndexError(resp.status_code, reason)
+            raise BaseIndexError(resp.status_code, reason) from err
 
     # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
     # For creating aliases for indexd records, prefer using
@@ -442,7 +440,7 @@ class DocumentDeletedError(Exception):
     pass
 
 
-class Document(object):
+class Document:
     def __init__(self, client, did, json=None):
         self.client = client
         self.did = did
@@ -500,19 +498,19 @@ class Document(object):
 
     def to_json(self, include_rev=True):
         """local utility function to render document as json"""
-        json = self._render(include_rev=include_rev)
+        json_data = self._render(include_rev=include_rev)
         if self.did:
-            json["did"] = self.did
-        return json
+            json_data["did"] = self.did
+        return json_data
 
     def _load(self, json=None):
         """Load the document contents from the server or from the provided dictionary"""
         self._check_deleted()
-        json = json or self.client._get("index", self.did).json()
+        json_data = json or self.client._get("index", self.did).json()
         # set attributes to current Document
-        for key, value in json.items():
+        for key, value in json_data.items():
             self.__dict__[key] = value
-        self._attrs = json.keys()
+        self._attrs = json_data.keys()
         self._fetched = True
 
     def _doc_for_update(self):
@@ -569,7 +567,6 @@ def recursive_sort(value):
     """
     if isinstance(value, dict):
         return {key: recursive_sort(value[key]) for key in value.keys()}
-    elif isinstance(value, list):
+    if isinstance(value, list):
         return sorted([recursive_sort(element) for element in value])
-    else:
-        return value
+    return value

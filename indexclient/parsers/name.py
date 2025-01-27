@@ -1,7 +1,6 @@
+import json
 import logging
 import sys
-import json
-import argparse
 import warnings
 
 import requests
@@ -64,13 +63,13 @@ def name_record(
     try:
         res.raise_for_status()
     except Exception as err:
-        raise errors.BaseIndexError(res.status_code, res.text)
+        raise errors.BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise errors.BaseIndexError(res.status_code, reason)
+        raise errors.BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 
