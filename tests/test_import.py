@@ -9,6 +9,8 @@ def test_import_index():
     """
     import indexclient
 
+    assert indexclient is not None
+
 
 @patch("indexclient.client.handle_error")
 @patch("requests.get")

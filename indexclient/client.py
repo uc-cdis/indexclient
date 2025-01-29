@@ -441,7 +441,7 @@ class DocumentDeletedError(Exception):
 
 
 class Document:
-    def __init__(self, client, did, json=None):
+    def __init__(self, client, did, json=None):  # pylint: disable=redefined-outer-name
         self.client = client
         self.did = did
         self._fetched = False
@@ -503,10 +503,15 @@ class Document:
             json_data["did"] = self.did
         return json_data
 
-    def _load(self, json=None):
+    def _load(self, json_data_input=None):
         """Load the document contents from the server or from the provided dictionary"""
         self._check_deleted()
-        json_data = json or self.client._get("index", self.did).json()
+        json_data = (
+            json_data_input
+            or self.client._get(  # pylint: disable=protected-access
+                "index", self.did
+            ).json()
+        )
         # set attributes to current Document
         for key, value in json_data.items():
             self.__dict__[key] = value
@@ -541,7 +546,7 @@ class Document:
         """
 
         self._check_deleted()
-        self.client._put(
+        self.client._put(  # pylint: disable=protected-access
             "index",
             self.did,
             params={"rev": self.rev},
@@ -554,7 +559,7 @@ class Document:
     def delete(self):
         """delete and mark as deleted"""
         self._check_deleted()
-        self.client._delete(
+        self.client._delete(  # pylint: disable=protected-access
             "index", self.did, auth=self.client.auth, params={"rev": self.rev}
         )
         self._deleted = True
