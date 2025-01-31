@@ -1,25 +1,20 @@
 #!/usr/bin/env python
 
-import sys
-import json
-import logging
 import argparse
-
-try:
-    from urllib import parse as urlparse
-except ImportError:  # Python 2.x
-    import urlparse
+import logging
+import sys
 
 import requests
 
-from index import errors
-from index.parsers import info
-from index.parsers import name
-from index.parsers import search
-from index.parsers import create
-from index.parsers import retrieve
-from index.parsers import update
-from index.parsers import delete
+
+from indexclient import errors
+from indexclient.parsers import info
+from indexclient.parsers import name
+from indexclient.parsers import search
+from indexclient.parsers import create
+from indexclient.parsers import retrieve
+from indexclient.parsers import update
+from indexclient.parsers import delete
 
 
 def setup_logging(log_levels, log_stream, **kwargs):
@@ -27,7 +22,8 @@ def setup_logging(log_levels, log_stream, **kwargs):
     Sets up basic logging.
     """
     logging.basicConfig(
-        level=min(log_levels), stream=log_stream,
+        level=min(log_levels),
+        stream=log_stream,
     )
 
 
@@ -70,44 +66,71 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--host", default="localhost", help="indexd server host [localhost]",
+        "--host",
+        default="localhost",
+        help="indexd server host [localhost]",
     )
 
     parser.add_argument(
-        "--port", default=8080, type=int, help="indexd server port [8080]",
+        "--port",
+        default=8080,
+        type=int,
+        help="indexd server port [8080]",
     )
 
     # Add index and alias sub-commands.
-    subparsers = parser.add_subparsers(title="commands", dest="command",)
+    subparsers = parser.add_subparsers(
+        title="commands",
+        dest="command",
+    )
     subparsers.required = True
 
-    info_subparser = subparsers.add_parser("info", help="retrieve information by name",)
+    info_subparser = subparsers.add_parser(
+        "info",
+        help="retrieve information by name",
+    )
     info_subparser.set_defaults(func=not_implemented)
     info.config(info_subparser)
 
     name_subparser = subparsers.add_parser(
-        "name", help="create or update a name with information",
+        "name",
+        help="create or update a name with information",
     )
     name_subparser.set_defaults(func=not_implemented)
     name.config(name_subparser)
 
-    search_subparser = subparsers.add_parser("search", help="search for records",)
+    search_subparser = subparsers.add_parser(
+        "search",
+        help="search for records",
+    )
     search_subparser.set_defaults(func=not_implemented)
     search.config(search_subparser)
 
-    create_subparser = subparsers.add_parser("create", help="create a record",)
+    create_subparser = subparsers.add_parser(
+        "create",
+        help="create a record",
+    )
     create_subparser.set_defaults(func=not_implemented)
     create.config(create_subparser)
 
-    retrieve_subparser = subparsers.add_parser("retrieve", help="retrieve a record",)
+    retrieve_subparser = subparsers.add_parser(
+        "retrieve",
+        help="retrieve a record",
+    )
     retrieve_subparser.set_defaults(func=not_implemented)
     retrieve.config(retrieve_subparser)
 
-    update_subparser = subparsers.add_parser("update", help="update a record",)
+    update_subparser = subparsers.add_parser(
+        "update",
+        help="update a record",
+    )
     update_subparser.set_defaults(func=not_implemented)
     update.config(update_subparser)
 
-    delete_subparser = subparsers.add_parser("delete", help="delete a record",)
+    delete_subparser = subparsers.add_parser(
+        "delete",
+        help="delete a record",
+    )
     delete_subparser.set_defaults(func=not_implemented)
     delete.config(delete_subparser)
 
