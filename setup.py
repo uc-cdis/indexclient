@@ -4,6 +4,7 @@ from setuptools import setup
 
 
 def get_version():
+    """Get version"""
     # https://github.com/uc-cdis/dictionaryutils/pull/37#discussion_r257898408
     try:
         tag = check_output(
