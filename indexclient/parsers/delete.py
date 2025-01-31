@@ -5,7 +5,7 @@ from indexclient.errors import BaseIndexError
 
 def delete_record(host, port, did, rev, **kwargs):
     """
-    Create a new record.
+    Delete a record.
     """
     resource = "http://{host}:{port}/index/{did}".format(host=host, port=port, did=did)
 
