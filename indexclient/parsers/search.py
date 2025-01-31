@@ -8,6 +8,19 @@ import requests
 from indexclient import errors
 
 
+def _remove_extra_hashes(hash_dict, hash_set):
+    """Remove extra hashes from set, log errors"""
+    logging.error("multiple incompatible hashes specified")
+
+    for hash in hash_dict.items():
+        hash_set.remove(hash)
+
+    for hash, _ in hash_set:
+        logging.error(f"multiple values specified for {hash}")
+
+    return hash_set
+
+
 def search_record(host, port, limit, start, size, hashes, **kwargs):
     """
     Finds records matching specified search criteria.
@@ -22,13 +35,7 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for hash in hash_dict.items():
-            hash_set.remove(hash)
-
-        for hash, _ in hash_set:
-            logging.error(f"multiple values specified for {hash}")
+        hash_set = _remove_extra_hashes(hash_dict, hash_set)
 
         raise ValueError("conflicting hashes provided")
 
@@ -80,13 +87,7 @@ def search_names(host, port, limit, start, size, hashes, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for hash in hash_dict.items():
-            hash_set.remove(hash)
-
-        for hash, _ in hash_set:
-            logging.error("multiple values specified for {hash}")
+        hash_set = _remove_extra_hashes(hash_dict, hash_set)
 
         raise ValueError("conflicting hashes provided")
 
