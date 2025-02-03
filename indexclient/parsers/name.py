@@ -41,11 +41,11 @@ def name_record(
     if len(hash_dict) < len(hash_set):
         logging.error("multiple incompatible hashes specified")
 
-        for hash in hash_dict.items():
-            hash_set.remove(hash)
+        for hash_item in hash_dict.items():
+            hash_set.remove(hash_item)
 
-        for hash, _ in hash_set:
-            logging.error(f"multiple values specified for {hash}")
+        for hash_item, _ in hash_set:
+            logging.error(f"multiple values specified for {hash_item}")
 
         raise ValueError("conflicting hashes provided")
 

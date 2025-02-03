@@ -10,7 +10,7 @@ def retrieve_record(host, port, did, **kwargs):
     """
     Retrieve a record by id.
     """
-    resource = "http://{host}:{port}/index/{did}".format(host=host, port=port, did=did)
+    resource = f"http://{host}:{port}/index/{did}"
 
     res = requests.get(resource)
 

@@ -6,15 +6,8 @@ import sys
 
 import requests
 
-
 from indexclient import errors
-from indexclient.parsers import info
-from indexclient.parsers import name
-from indexclient.parsers import search
-from indexclient.parsers import create
-from indexclient.parsers import retrieve
-from indexclient.parsers import update
-from indexclient.parsers import delete
+from indexclient.parsers import create, delete, info, name, retrieve, search, update
 
 
 def setup_logging(log_levels, log_stream, **kwargs):

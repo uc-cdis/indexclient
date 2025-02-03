@@ -7,7 +7,7 @@ def delete_record(host, port, did, rev, **kwargs):
     """
     Delete a record.
     """
-    resource = "http://{host}:{port}/index/{did}".format(host=host, port=port, did=did)
+    resource = f"http://{host}:{port}/index/{did}"
 
     params = {"rev": rev}
 
