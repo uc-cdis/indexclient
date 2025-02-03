@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "indexclient"
-version = "2.3.0"
+version = "2.3.2"
 description = "Data-indexing and tracking client"
 authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 license = "Apache-2.0"
