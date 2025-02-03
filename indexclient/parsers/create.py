@@ -1,10 +1,10 @@
 import json
-import logging
 import sys
 
 import requests
 
 from indexclient.errors import BaseIndexError
+from indexclient.parsers.utils import remove_extra_hashes
 
 
 def create_record(host, port, form, size, urls, hashes, **kwargs):
@@ -22,14 +22,7 @@ def create_record(host, port, form, size, urls, hashes, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for hash_item in hash_dict.items():
-            hash_set.remove(hash_item)
-
-        for hash_item, _ in hash_set:
-            logging.error(f"multiple values specified for {hash_item}")
-
+        hash_set = remove_extra_hashes(hash_dict, hash_set)
         raise ValueError("conflicting hashes provided")
 
     data = {
