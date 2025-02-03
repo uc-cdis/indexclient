@@ -254,7 +254,7 @@ def test_add_alias_for_did(index_client):
 )
 def test_reformat_params(index_client, params_copy, expected_reformatted):
     """test the reformat_params method"""
-    reformatted = index_client._reformat_params(
+    reformatted = index_client._reformat_params(  # pylint: disable=protected-access
         params_copy
-    )  # pylint: disable=protected-access
+    )
     assert reformatted == expected_reformatted
