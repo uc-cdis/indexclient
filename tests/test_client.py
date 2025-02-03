@@ -240,3 +240,21 @@ def test_add_alias_for_did(index_client):
     doc = index_client.global_get(alias)
     assert doc is not None, f"Failed to retrieve document {did} using alias {alias}"
     assert doc.did == did, f"Retrieved incorrect document {did}, expected {alias}"
+
+
+@pytest.mark.parametrize(
+    "params_copy, expected_reformatted",
+    [
+        ({}, {}),
+        (
+            {"hash": {"md5": 555}, "metadata": {"foo": "bar"}, "other": {"bim": "bam"}},
+            {"hash": ["md5:555"], "metadata": ["foo:bar"], "other": {"bim": "bam"}},
+        ),
+    ],
+)
+def test_reformat_params(index_client, params_copy, expected_reformatted):
+    """test the reformat_params method"""
+    reformatted = index_client._reformat_params(
+        params_copy
+    )  # pylint: disable=protected-access
+    assert reformatted == expected_reformatted

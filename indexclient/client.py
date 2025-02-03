@@ -78,6 +78,18 @@ class IndexClient:
         sub_path = "/".join(path).lstrip("/")
         return f"{parent_path}/{sub_path}"
 
+    def _reformat_params(self, params_copy):
+        """flatten key, value items in ['hash', 'metadata']"""
+        reformatted_params = {}
+        for param in ["hash", "metadata"]:
+            if param in params_copy:
+                reformatted_params[param] = []
+                for key, value in params_copy[param].items():
+                    reformatted_params[param].append(str(key) + ":" + str(value))
+                del params_copy[param]
+        reformatted_params.update(params_copy)
+        return reformatted_params
+
     def check_status(self):
         """Check that the API we are trying to communicate with is online"""
         resp = requests.get(self.url + "/index")
@@ -159,14 +171,7 @@ class IndexClient:
         params_copy = copy.deepcopy(params) or {}
         if "hashes" in params_copy:
             params_copy["hash"] = params_copy.pop("hashes")
-        reformatted_params = {}
-        for param in ["hash", "metadata"]:
-            if param in params_copy:
-                reformatted_params[param] = []
-                for key, value in params_copy[param].items():
-                    reformatted_params[param].append(str(key) + ":" + str(value))
-                del params_copy[param]
-        reformatted_params.update(params_copy)
+        reformatted_params = self._reformat_params(params_copy)
         reformatted_params["limit"] = 1
 
         try:
@@ -206,14 +211,7 @@ class IndexClient:
             params_copy["hash"] = params_copy.pop("hashes")
         if "urls_metadata" in params_copy:
             params_copy["urls_metadata"] = json.dumps(params_copy.pop("urls_metadata"))
-        reformatted_params = {}
-        for param in ["hash", "metadata"]:
-            if param in params_copy:
-                reformatted_params[param] = []
-                for key, value in params_copy[param].items():
-                    reformatted_params[param].append(str(key) + ":" + str(value))
-                del params_copy[param]
-        reformatted_params.update(params_copy)
+        reformatted_params = self._reformat_params(params_copy)
         reformatted_params.update({"limit": page_size, "start": start})
         if negate_params:
             reformatted_params.update({"negate_params": json.dumps(negate_params)})
