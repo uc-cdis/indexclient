@@ -1,0 +1,32 @@
+dist: jammy
+language: python
+python:
+- '3.9'
+sudo: false
+env:
+  global:
+  - PIPENV_IGNORE_VIRTUALENVS=1
+  - secure: mLm9xvmW1+w0StFnkgCxE/OE9Ov6MCzb0eU8dZyANZCNKAMBCNIq2hKnySoaH9TN9vU8CGVxdCBSSC8B6BQ/kgTnpU/ZPevMKs1lPuvKSp1XJFW5dfx5YlKuBTNz/JegWhD9kOX3fbMm87e0wfMTCMpzjOZRPZSx15zIfMir1g9xTGB+dKazkGoQmiDrSpu4W0/UOGp0Ni3ISwAGt8lQ2wtZCQ6+vsPvdBnnSXWIS60MHzYIxxWbIPCDw21EcLJJH6IZyMpdWVfcYz3/Tsd4vtJGS9d3WXRpJqCrMUzdh1py/rzhiyh6LoqYsYIfge9sI/MYZ5TcCwS+jE42iL4k2WIVwWOANnc/kDo8RntEfx8+IxxbUHikogab0iaqj64xGhXbi5OzWnVTZZP2G17jcBL/Dxfa/OPltyLMuJRzrL/woaMJAQPv7sDqsuuaPJA1J8Ez+ZVqCVHVECrNyH+vgR2hi7w7Hp68Z9bDRTYvcBZ87WC/AaDIaHlAhUQt5CffBeIhAhHuh9WlHUcnrg7PbCruJ9yRJfy/glDJagEsvTHw7lVhlKNJPbioyH6iV5EYhAynNI/42ihh54PhOZ7jQLidfmBdiGIc6K5wgd8j/anReUqzy1HBNvK9J5itVnhbopY0ukjNkXKJ/aH7SDZAJnUpyPxsw8AIueIzzvpzMI0=
+install:
+- pip install pipenv
+- pipenv install --dev --deploy --python `which python`
+- pipenv graph
+script: pipenv run pytest -vv
+before_deploy:
+- sed -i.bak "s/=get_version()/='$TRAVIS_TAG'/g" setup.py
+- cat setup.py
+- if [ $(python setup.py --version) == '0.0.0' ]; then travis_terminate 1; fi
+deploy:
+  provider: pypi
+  user: uc-ctds
+  skip_existing: true
+  skip_cleanup: true
+  on:
+    python: 3.9
+    repo: uc-cdis/indexclient
+    tags: true
+  password:
+    secure: IUxurRqEZXtpJUgP+dJsdmUogvhOHQu1yQHcnihKEkPgR8qqQpw91HiRA03wBOndrY6MM17REV06Bed0qO0ezIjfM20Ez5ZL9c8xao5FxcyvTAM9R43K7Ufa3Iqy3ZOXsbXsy9BCnw574zJD1WgdoZQnUVeIioF1xw9ELB+oIaE1rDGS09hHRIRTz++KKTwb9aqOEcMojcl98V7lQP3KVAgeWJ3YHjxZ1GZuk9RwL4dhX8aDEP8beA6Y7ihf/8X3j+ynQnHQAKpcMK5gz0JaXozXakKbA/fU+u4zLjYuCS5B2NB8qPCzg+yyrIdNTRBZJLo3tVix067acgue3JbKR0YjWP1vOqOg0tFjhPu+6zKcB1AvdiAddqhxnO5xJa8XDAsliOxyM+0eMp9Q9aMYAda3M4KM0N0+ZWwfFWem2pv+Ae0/d/CF1pY3p2gZYL6uSPn+I/9D0FNpIhqSSFd9g8M6QV36PGYZzwmch5pqf/Zzun4VFPYaf/cWlalz5zVtaQrU+8JLDzjevBnUv7wumif0HM8eb3dcLZxL6FShjs6r274idvVeI47q1E8I6Lec8UIIYkbBYqgrgiDl9nVt3lCE1kJ7biRuk9yIPAYz2a29Id8pf7wAPmZg1MK4t0niULvXDgGL9SfcOGyg1au5jL4PEJib7Ub7On0pB4Ut7kA=
+after_deploy:
+- pipenv run pip install gen3git
+- pipenv run gen3git release
