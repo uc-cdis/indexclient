@@ -1,12 +1,11 @@
-import sys
 import json
-import logging
-import argparse
+import sys
 import warnings
 
 import requests
 
 from indexclient import errors
+from indexclient.parsers.utils import remove_extra_hashes
 
 
 def search_record(host, port, limit, start, size, hashes, **kwargs):
@@ -23,19 +22,13 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for h in hash_dict.items():
-            hash_set.remove(h)
-
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
+        hash_set = remove_extra_hashes(hash_dict, hash_set)
 
         raise ValueError("conflicting hashes provided")
 
     hashes = [":".join([h, v]) for h, v in hash_dict.items()]
 
-    resource = "http://{host}:{port}/index/".format(host=host, port=port)
+    resource = f"http://{host}:{port}/index/"
 
     params = {"limit": limit, "start": start, "hash": hashes, "size": size}
 
@@ -44,13 +37,13 @@ def search_record(host, port, limit, start, size, hashes, **kwargs):
     try:
         res.raise_for_status()
     except Exception as err:
-        raise errors.BaseIndexError(res.status_code, res.text)
+        raise errors.BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise errors.BaseIndexError(res.status_code, reason)
+        raise errors.BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 
@@ -81,19 +74,12 @@ def search_names(host, port, limit, start, size, hashes, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for h in hash_dict.items():
-            hash_set.remove(h)
-
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
-
+        hash_set = remove_extra_hashes(hash_dict, hash_set)
         raise ValueError("conflicting hashes provided")
 
     hashes = [":".join([h, v]) for h, v in hash_dict.items()]
 
-    resource = "http://{host}:{port}/alias/".format(host=host, port=port)
+    resource = f"http://{host}:{port}/alias/"
 
     params = {"limit": limit, "start": start, "size": size, "hashes": hashes}
 
@@ -102,13 +88,13 @@ def search_names(host, port, limit, start, size, hashes, **kwargs):
     try:
         res.raise_for_status()
     except Exception as err:
-        raise errors.BaseIndexError(res.status_code, res.text)
+        raise errors.BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise errors.BaseIndexError(res.status_code, reason)
+        raise errors.BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 

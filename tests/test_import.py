@@ -1,8 +1,6 @@
-# Python 2 and 3 compatible
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+from unittest.mock import patch
+
+from indexclient.client import IndexClient
 
 
 def test_import_index():
@@ -11,11 +9,13 @@ def test_import_index():
     """
     import indexclient
 
+    assert indexclient is not None
+
 
 @patch("indexclient.client.handle_error")
 @patch("requests.get")
 def test_hashes(get_request_mock, handle_error_mock):
-    from indexclient.client import IndexClient
+    """Test get_with_params"""
 
     input_params = {"hashes": {"md5": "00000000000000000000000000000001"}, "size": "1"}
 

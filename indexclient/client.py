@@ -23,10 +23,12 @@ UPDATABLE_ATTRS = [
 
 
 def json_dumps(data):
+    """local utility function to dump dictionary"""
     return json.dumps({k: v for (k, v) in data.items() if v is not None})
 
 
 def handle_error(resp):
+    """local utility function to raise exception"""
     if 400 <= resp.status_code < 600:
         try:
             json_resp = resp.json()
@@ -38,6 +40,8 @@ def handle_error(resp):
 
 
 def timeout_wrapper(func):
+    """local utility decorator"""
+
     def timeout(*args, **kwargs):
         kwargs.setdefault("timeout", 60)
         return func(*args, **kwargs)
@@ -46,6 +50,8 @@ def timeout_wrapper(func):
 
 
 def retry_and_timeout_wrapper(func):
+    """local utility decorator to add retry and timeout"""
+
     def retry_logic_with_timeout(*args, **kwargs):
         kwargs.setdefault("timeout", 60)
         retries = 0
@@ -60,15 +66,29 @@ def retry_and_timeout_wrapper(func):
     return retry_logic_with_timeout
 
 
-class IndexClient(object):
+class IndexClient:
     def __init__(self, baseurl, version="v0", auth=None):
         self.auth = auth
         self.url = baseurl
         self.version = version
 
     def url_for(self, *path):
-        subpath = "/".join(path).lstrip("/")
-        return "{}/{}".format(self.url.rstrip("/"), subpath)
+        """build url"""
+        parent_path = self.url.rstrip("/")
+        sub_path = "/".join(path).lstrip("/")
+        return f"{parent_path}/{sub_path}"
+
+    def _reformat_params(self, params_copy):
+        """flatten key, value items in ['hash', 'metadata']"""
+        reformatted_params = {}
+        for param in ["hash", "metadata"]:
+            if param in params_copy:
+                reformatted_params[param] = []
+                for key, value in params_copy[param].items():
+                    reformatted_params[param].append(str(key) + ":" + str(value))
+                del params_copy[param]
+        reformatted_params.update(params_copy)
+        return reformatted_params
 
     def check_status(self):
         """Check that the API we are trying to communicate with is online"""
@@ -93,11 +113,10 @@ class IndexClient(object):
                 response = self._get(did, params={"no_dist": ""})
             else:
                 response = self._get(did)
-        except requests.HTTPError as e:
-            if e.response.status_code == 404:
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
                 return None
-            else:
-                raise e
+            raise err
 
         return Document(self, did, json=response.json())
 
@@ -112,11 +131,10 @@ class IndexClient(object):
         """
         try:
             response = self._get("index", did)
-        except requests.HTTPError as e:
-            if e.response.status_code == 404:
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
                 return None
-            else:
-                raise e
+            raise err
 
         return Document(self, did, json=response.json())
 
@@ -138,8 +156,7 @@ class IndexClient(object):
         except requests.HTTPError as exception:
             if exception.response.status_code == 404:
                 return None
-            else:
-                raise exception
+            raise exception
 
         return [Document(self, doc["did"], json=doc) for doc in response.json()]
 
@@ -154,28 +171,20 @@ class IndexClient(object):
         params_copy = copy.deepcopy(params) or {}
         if "hashes" in params_copy:
             params_copy["hash"] = params_copy.pop("hashes")
-        reformatted_params = dict()
-        for param in ["hash", "metadata"]:
-            if param in params_copy:
-                reformatted_params[param] = []
-                for k, v in params_copy[param].items():
-                    reformatted_params[param].append(str(k) + ":" + str(v))
-                del params_copy[param]
-        reformatted_params.update(params_copy)
+        reformatted_params = self._reformat_params(params_copy)
         reformatted_params["limit"] = 1
 
         try:
             response = self._get("index", params=reformatted_params)
-        except requests.HTTPError as e:
-            if e.response.status_code == 404:
+        except requests.HTTPError as err:
+            if err.response.status_code == 404:
                 return None
-            else:
-                raise e
+            raise err
         if not response.json()["records"]:
             return None
-        json = response.json()["records"][0]
-        did = json["did"]
-        return Document(self, did, json=json)
+        json_data = response.json()["records"][0]
+        did = json_data["did"]
+        return Document(self, did, json=json_data)
 
     def list(self, limit=float("inf"), start=None, page_size=100):
         """Returns a generator of document objects."""
@@ -202,14 +211,7 @@ class IndexClient(object):
             params_copy["hash"] = params_copy.pop("hashes")
         if "urls_metadata" in params_copy:
             params_copy["urls_metadata"] = json.dumps(params_copy.pop("urls_metadata"))
-        reformatted_params = dict()
-        for param in ["hash", "metadata"]:
-            if param in params_copy:
-                reformatted_params[param] = []
-                for k, v in params_copy[param].items():
-                    reformatted_params[param].append(str(k) + ":" + str(v))
-                del params_copy[param]
-        reformatted_params.update(params_copy)
+        reformatted_params = self._reformat_params(params_copy)
         reformatted_params.update({"limit": page_size, "start": start})
         if negate_params:
             reformatted_params.update({"negate_params": json.dumps(negate_params)})
@@ -270,7 +272,7 @@ class IndexClient(object):
 
         if urls is None:
             urls = []
-        json = {
+        json_data = {
             "urls": urls,
             "form": "object",
             "hashes": hashes,
@@ -287,11 +289,11 @@ class IndexClient(object):
             "content_updated_date": content_updated_date,
         }
         if did:
-            json["did"] = did
+            json_data["did"] = did
         resp = self._post(
             "index/",
             headers={"content-type": "application/json"},
-            data=json_dumps(json),
+            data=json_dumps(json_data),
             auth=self.auth,
         )
         return Document(self, resp.json()["did"])
@@ -313,7 +315,7 @@ class IndexClient(object):
         """
         alias_payload = {"aliases": [{"value": alias}]}
         resp = self._post(
-            "index/{}/aliases".format(did),
+            f"index/{did}/aliases",
             headers={"content-type": "application/json"},
             data=json.dumps(alias_payload),
             auth=self.auth,
@@ -321,10 +323,8 @@ class IndexClient(object):
         try:
             return resp.json()
         except ValueError as err:
-            reason = json.dumps(
-                {"error": "invalid json payload returned: {}".format(err)}
-            )
-            raise BaseIndexError(resp.status_code, reason)
+            reason = json.dumps({"error": f"invalid json payload returned: {err}"})
+            raise BaseIndexError(resp.status_code, reason) from err
 
     # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
     # For creating aliases for indexd records, prefer using
@@ -340,6 +340,7 @@ class IndexClient(object):
         host_authorities=None,
         keeper_authority=None,
     ):
+        """create alias"""
         warnings.warn(
             (
                 "This function is deprecated. For creating aliases for indexd "
@@ -365,6 +366,8 @@ class IndexClient(object):
 
     def get_latest_version(self, did, skip_null_versions=False):
         """
+        Get latest version
+
         Args:
             did (str): document id of an existing entry whose latest version is requested
             skip_null_versions (bool): if True, exclude entries without a version
@@ -381,6 +384,7 @@ class IndexClient(object):
 
     def add_version(self, current_did, new_doc):
         """
+        Add version
 
         Args:
             current_did (str): did of an existing index whose baseid will be shared
@@ -397,11 +401,11 @@ class IndexClient(object):
         return None
 
     def list_versions(self, did):
-        # type: (str) -> list[Document]
-        versions_dict = self._get("index", did, "versions").json()  # type: dict
+        """get list of versions, returns list of dicts"""
+        versions_dict = self._get("index", did, "versions").json()
         versions = []
 
-        for _, version in versions_dict.items():
+        for version in versions_dict.values():
             versions.append(Document(self, version["did"], version))
         return versions
 
@@ -434,8 +438,8 @@ class DocumentDeletedError(Exception):
     pass
 
 
-class Document(object):
-    def __init__(self, client, did, json=None):
+class Document:
+    def __init__(self, client, did, json=None):  # pylint: disable=redefined-outer-name
         self.client = client
         self.did = did
         self._fetched = False
@@ -474,15 +478,15 @@ class Document(object):
             <Document(size=1, form=object, file_name=filename.txt, ...)>
         """
         attributes = ", ".join(
-            ["{}={}".format(attr, self.__dict__[attr]) for attr in self._attrs]
+            [f"{attr}={self.__dict__[attr]}" for attr in self._attrs]
         )
         return "<Document(" + attributes + ")>"
 
     def _check_deleted(self):
         if self._deleted:
-            raise DocumentDeletedError("document {} has been deleted".format(self.did))
+            raise DocumentDeletedError(f"document {self.did} has been deleted")
 
-    def _render(self, include_rev=True):
+    def _render(self, include_rev=True):  # pylint: disable=unused-argument
         self._check_deleted()
         if not self._fetched:
             raise RuntimeError(
@@ -491,19 +495,25 @@ class Document(object):
         return self._doc
 
     def to_json(self, include_rev=True):
-        json = self._render(include_rev=include_rev)
+        """local utility function to render document as json"""
+        json_data = self._render(include_rev=include_rev)
         if self.did:
-            json["did"] = self.did
-        return json
+            json_data["did"] = self.did
+        return json_data
 
-    def _load(self, json=None):
+    def _load(self, json_data_input=None):
         """Load the document contents from the server or from the provided dictionary"""
         self._check_deleted()
-        json = json or self.client._get("index", self.did).json()
+        json_data = (
+            json_data_input
+            or self.client._get(  # pylint: disable=protected-access
+                "index", self.did
+            ).json()
+        )
         # set attributes to current Document
-        for k, v in json.items():
-            self.__dict__[k] = v
-        self._attrs = json.keys()
+        for key, value in json_data.items():
+            self.__dict__[key] = value
+        self._attrs = json_data.keys()
         self._fetched = True
 
     def _doc_for_update(self):
@@ -534,7 +544,7 @@ class Document(object):
         """
 
         self._check_deleted()
-        self.client._put(
+        self.client._put(  # pylint: disable=protected-access
             "index",
             self.did,
             params={"rev": self.rev},
@@ -545,8 +555,9 @@ class Document(object):
         self._load()  # to sync new rev from server
 
     def delete(self):
+        """delete and mark as deleted"""
         self._check_deleted()
-        self.client._delete(
+        self.client._delete(  # pylint: disable=protected-access
             "index", self.did, auth=self.client.auth, params={"rev": self.rev}
         )
         self._deleted = True
@@ -559,7 +570,6 @@ def recursive_sort(value):
     """
     if isinstance(value, dict):
         return {key: recursive_sort(value[key]) for key in value.keys()}
-    elif isinstance(value, list):
+    if isinstance(value, list):
         return sorted([recursive_sort(element) for element in value])
-    else:
-        return value
+    return value

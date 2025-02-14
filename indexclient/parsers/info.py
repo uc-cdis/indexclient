@@ -1,7 +1,5 @@
-import sys
 import json
-import logging
-import argparse
+import sys
 import warnings
 
 import requests
@@ -25,22 +23,20 @@ def info(host, port, name, **kwargs):
         ),
         DeprecationWarning,
     )
-    resource = "http://{host}:{port}/alias/{name}".format(
-        host=host, port=port, name=name
-    )
+    resource = f"http://{host}:{port}/alias/{name}"
 
     res = requests.get(resource)
 
     try:
         res.raise_for_status()
     except Exception as err:
-        raise errors.BaseIndexError(res.status_code, res.text)
+        raise errors.BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise errors.BaseIndexError(res.status_code, reason)
+        raise errors.BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 

@@ -1,17 +1,17 @@
-import sys
 import json
-import argparse
+import sys
 
 import requests
 
 from indexclient.errors import BaseIndexError
+from indexclient.parsers.utils import remove_extra_hashes
 
 
 def update_record(host, port, did, rev, size, hashes, urls, **kwargs):
     """
     Update a record.
     """
-    resource = "http://{host}:{port}/index/{did}".format(host=host, port=port, did=did)
+    resource = f"http://{host}:{port}/index/{did}"
 
     params = {"rev": rev}
 
@@ -24,14 +24,7 @@ def update_record(host, port, did, rev, size, hashes, urls, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for h in hash_dict.items():
-            hash_set.remove(h)
-
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
-
+        hash_set = remove_extra_hashes(hash_dict, hash_set)
         raise ValueError("conflicting hashes provided")
 
     data = {"size": size, "urls": [u for u in urls_set], "hashes": hash_dict}
@@ -41,13 +34,13 @@ def update_record(host, port, did, rev, size, hashes, urls, **kwargs):
     try:
         res.raise_for_status()
     except Exception as err:
-        raise BaseIndexError(res.status_code, res.text)
+        raise BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise BaseIndexError(res.status_code, reason)
+        raise BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 

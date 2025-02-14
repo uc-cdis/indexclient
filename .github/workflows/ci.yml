@@ -1,0 +1,48 @@
+# push will run on every pushed commit to any branch (so this will rerun the tests
+# once a branch gets merged to main in addition to any new commits on any branch)
+on: push
+
+name: CI
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  Security:
+    name: Security Pipeline
+    uses: uc-cdis/.github/.github/workflows/securitypipeline.yaml@master
+    with:
+      python-poetry: 'true'
+    secrets: inherit
+
+  UnitTest:
+    name: Python Unit Test with Postgres
+    uses: uc-cdis/.github/.github/workflows/python_unit_test.yaml@master
+    with:
+      python-version: '3.9'
+      use-cache: true
+
+  # this creates linter settings and uploads to an artifact so the configs can be pulled and used across jobs
+  LintConfig:
+    name: Get Lint Config
+    uses: uc-cdis/.github/.github/workflows/lint-create-config.yaml@master
+    with:
+      python-module-name: "indexclient"
+
+  RequiredLint:
+    name: Run Required Linters
+    needs: [ LintConfig ]
+    uses: uc-cdis/.github/.github/workflows/required_lint_check.yaml@master
+    with:
+      python-version: '3.9'
+      use-cache: true
+
+  InformationalLint:
+   name: Run Informational Linters
+   needs: [ LintConfig ] #TODO Add UnitTest
+   if: github.ref != 'refs/heads/main'
+   uses: uc-cdis/.github/.github/workflows/optional_lint_check.yaml@master
+   with:
+     python-version: '3.9'
+     use-cache: true

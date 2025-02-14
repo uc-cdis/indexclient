@@ -1,17 +1,17 @@
-import sys
 import json
-import argparse
+import sys
 
 import requests
 
 from indexclient.errors import BaseIndexError
+from indexclient.parsers.utils import remove_extra_hashes
 
 
 def create_record(host, port, form, size, urls, hashes, **kwargs):
     """
     Create a new record.
     """
-    resource = "http://{host}:{port}/index/".format(host=host, port=port)
+    resource = f"http://{host}:{port}/index/"
 
     if size < 0:
         raise ValueError("size must be non-negative")
@@ -22,14 +22,7 @@ def create_record(host, port, form, size, urls, hashes, **kwargs):
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for h in hash_dict.items():
-            hash_set.remove(h)
-
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
-
+        hash_set = remove_extra_hashes(hash_dict, hash_set)
         raise ValueError("conflicting hashes provided")
 
     data = {
@@ -44,13 +37,13 @@ def create_record(host, port, form, size, urls, hashes, **kwargs):
     try:
         res.raise_for_status()
     except Exception as err:
-        raise BaseIndexError(res.status_code, res.text)
+        raise BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise BaseIndexError(res.status_code, reason)
+        raise BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 

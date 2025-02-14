@@ -1,7 +1,5 @@
-import sys
 import json
-import logging
-import argparse
+import sys
 
 import requests
 
@@ -12,20 +10,20 @@ def retrieve_record(host, port, did, **kwargs):
     """
     Retrieve a record by id.
     """
-    resource = "http://{host}:{port}/index/{did}".format(host=host, port=port, did=did)
+    resource = f"http://{host}:{port}/index/{did}"
 
     res = requests.get(resource)
 
     try:
         res.raise_for_status()
     except Exception as err:
-        raise errors.BaseIndexError(res.status_code, res.text)
+        raise errors.BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise errors.BaseIndexError(res.status_code, reason)
+        raise errors.BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 

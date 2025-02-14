@@ -1,11 +1,11 @@
-import sys
 import json
-import argparse
+import sys
 import warnings
 
 import requests
 
 from indexclient import errors
+from indexclient.parsers.utils import remove_extra_hashes
 
 
 # DEPRECATED 11/2019 -- interacts with old `/alias/` endpoint.
@@ -26,9 +26,7 @@ def name_record(
         ),
         DeprecationWarning,
     )
-    resource = "http://{host}:{port}/alias/{name}".format(
-        host=host, port=port, name=name
-    )
+    resource = f"http://{host}:{port}/alias/{name}"
 
     params = {"rev": rev}
 
@@ -41,14 +39,7 @@ def name_record(
     hash_dict = {h: v for h, v in hash_set}
 
     if len(hash_dict) < len(hash_set):
-        logging.error("multiple incompatible hashes specified")
-
-        for h in hash_dict.items():
-            hash_set.remove(h)
-
-        for h, _ in hash_set:
-            logging.error("multiple values specified for {h}".format(h=h))
-
+        hash_set = remove_extra_hashes(hash_dict, hash_set)
         raise ValueError("conflicting hashes provided")
 
     data = {
@@ -65,13 +56,13 @@ def name_record(
     try:
         res.raise_for_status()
     except Exception as err:
-        raise errors.BaseIndexError(res.status_code, res.text)
+        raise errors.BaseIndexError(res.status_code, res.text) from err
 
     try:
         doc = res.json()
     except ValueError as err:
         reason = json.dumps({"error": "invalid json payload returned"})
-        raise errors.BaseIndexError(res.status_code, reason)
+        raise errors.BaseIndexError(res.status_code, reason) from err
 
     sys.stdout.write(json.dumps(doc))
 
