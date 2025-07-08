@@ -407,6 +407,8 @@ class IndexClient(object):
 
     @retry_and_timeout_wrapper
     def _get(self, *path, **kwargs):
+        if self.auth and 'auth' not in kwargs:
+            kwargs['auth'] = self.auth
         resp = requests.get(self.url_for(*path), **kwargs)
         handle_error(resp)
         return resp
