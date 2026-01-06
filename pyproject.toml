@@ -1,0 +1,19 @@
+[project]
+name = "indexclient"
+version = "2.3.0"
+description = ""
+authors = [
+]
+readme = "README.md"
+requires-python = ">=3.9, <4.0"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+cdisutilstest = { git = "https://github.com/uc-cdis/cdisutils-test.git", tag = "2.0.0" }
+indexd = { git = "https://github.com/uc-cdis/indexd.git", tag = "5.0.4" }
