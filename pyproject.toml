@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "indexclient"
+version = "3.0.0"
+description = ""
+authors = ["CTDS UChicago <cdis@uchicago.edu>"]
+license = "Apache-2.0"
+repository = "https://github.com/uc-cdis/indexclient"
+
+[tool.poetry.dependencies]
+python = ">=3.13, <4.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+mock = "*"
+requests = "*"
+cdisutilstest = { git = "https://github.com/uc-cdis/cdisutils-test.git", tag = "2.0.0" }
+indexd = { git = "https://github.com/uc-cdis/indexd.git", tag = "5.1.3" }
