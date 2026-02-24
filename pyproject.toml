@@ -4,7 +4,6 @@ version = "3.0.0"
 description = ""
 authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 license = "Apache-2.0"
-repository = "https://github.com/uc-cdis/indexclient"
 
 [tool.poetry.dependencies]
 python = ">=3.13, <4.0"
