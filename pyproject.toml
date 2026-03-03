@@ -10,8 +10,8 @@ python = ">=3.9, <4.0"
 tomli = ">=2.3.0" # required for python 3.10
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry>=1.4.1"]
+build-backend = "poetry.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
