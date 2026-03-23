@@ -1,5 +1,9 @@
 Indexclient
-===
+
+> This library now lives at https://github.com/uc-cdis/indexd/tree/master/indexclient
+
+---
+
 ![version](https://img.shields.io/badge/version-2.0.0-green.svg?style=flat) [![Apache license](http://img.shields.io/badge/license-Apache-blue.svg?style=flat)](LICENSE) [![Travis](https://travis-ci.org/uc-cdis/indexclient.svg?branch=master)](https://travis-ci.org/uc-cdis/indexclient)
 
 Indexclient is a prototype data indexing and tracking client. It is intended to
